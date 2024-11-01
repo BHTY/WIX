@@ -7,4 +7,7 @@ Jumps to 0x7E00.
 
 STAGE 2
 ---16-bit Real Mode---
-The processor switches into 32-bit protected mode, sets up page tables (identity-mapping the lower 1MB and mapping in the kernel), and then jumps to the kernel's entry point.
+The processor sets up a flat GDT and switches into 32-bit protected mode.
+
+---32-bit Protected Mode---
+Sets up page tables (identity-mapping the lower 1MB and mapping in the kernel), and then jumps to the kernel's entry point.

@@ -1,2 +1,9 @@
 [org 0x7e00]
 
+[bits 16]
+
+mov al, 0x42
+mov ah, 0x0e
+int 0x10
+
+jmp $
