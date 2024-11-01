@@ -72,6 +72,34 @@ start_protected_mode:
 
     mov byte [0xb8000], 'A'
 
+    mov eax, 0x31007
+    mov [0x30000], eax
+
+    call fill_pt
+
+    mov eax, 0x30000
+    mov cr3, eax
+    mov eax, cr0
+    or eax, 0x80000001
+    mov cr0, eax
+
+    mov byte [0xb8000], 'B'
+
     jmp $
+
+fill_pt:
+    xor eax, eax
+
+    fill_pt_loop:
+        mov ebx, eax
+        shl ebx, 12
+        or ebx, 7
+        mov [eax * 4 + 0x31000], ebx
+
+        inc eax
+        cmp eax, 256
+        jne fill_pt_loop
+    
+    ret
 
 welcome_msg: db "Welcome to stage 2!", 0

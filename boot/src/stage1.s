@@ -43,6 +43,7 @@ call loadsector_lba
 
 ; load the ramdisk
 
+; push kernel_sectors & core_sectors
 jmp (STAGE2_SEGMENT << 4)
 
 jmp $
@@ -208,6 +209,9 @@ find_file:
         ret
 
     ret
+
+kernel_sectors: dw 0
+core_sectors: dw 0
 
 disk_num: db 0
 sectors_per_track: dw 0
