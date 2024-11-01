@@ -1,8 +1,8 @@
 STAGE 1 (boot sector)
 Mounts the boot disk's filesystem using int13 and loads the following files from disk
 - STAGE2.BIN (0x7E00)
-- KERNEL.BIN (0x1000)
-- CORE.TAR (0x8000)
+- KERNEL.BIN (0x10000)
+- RAMDISK.TAR (0x20000)
 Jumps to 0x7E00.
 
 STAGE 2
