@@ -1,5 +1,8 @@
 all:
+	$(eval CCBASE ?= i386-elf)
+	$(eval CFLAGS ?= -ffreestanding -m32 -g -c)
 	cd boot; make
+	cd kernel; make CCBASE="$(CCBASE)" CFLAGS="$(CFLAGS)"
 	cd disk; make
 
 clean:

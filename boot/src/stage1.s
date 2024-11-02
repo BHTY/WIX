@@ -24,26 +24,22 @@ call puts
 
 ; load stage2.bin
 mov si, stage2_name
-call find_file
-
-push bx
-push ax
-push ax
-call print_int
-pop ax
-pop bx
-
 push 0x0000
 push STAGE2_SEGMENT
-push bx
-push ax
-call loadsector_lba
+call load_file
 
 ; load the kernel image
+mov si, kernel_name
+push 0x0000
+push KERNEL_SEGMENT
+call load_file
+mov word [kernel_sectors], ax
 
 ; load the ramdisk
 
-; push kernel_sectors & core_sectors
+; push kernel_sectors & ramdisk_sectors
+push kernel_sectors
+push ramdisk_sectors
 jmp (STAGE2_SEGMENT << 4)
 
 jmp $
@@ -112,6 +108,31 @@ loadsector:
     pop bp
     ret 0xa
 
+; BP+4 = Linear Block Address
+; BP+6 = # of sectors to read
+; BP+8 = Segment to load into
+; BP+A = Offset to load into
+loadsectors_lba:
+    push bp
+    mov bp, sp
+
+    mov cx, word [bp+6]
+
+    loadsectors_loop:
+        push cx
+        push word [bp+0xa]
+        push word [bp+0x8]
+        push 0x01
+        push word [bp+0x4]
+        call loadsector_lba
+        pop cx
+        inc word [bp+4]
+        add word [bp+8], 0x20
+        loop loadsectors_loop
+
+    pop bp
+    ret 0x8
+
 ; Takes an LBA address off the stack, converts it to CHS, then loads it
 ; BP+4 = Linear Block Address
 ; BP+6 = # of sectors to read
@@ -139,6 +160,39 @@ loadsector_lba:
     push word [bp+0x6] ; push # of sectors to read
 
     call loadsector
+
+%if 0
+    push word [bp+4]
+    call print_int
+
+    mov al, ' '
+    mov ah, 0x0e
+    int 0x10
+
+    push word [bp+6]
+    call print_int
+
+    mov al, ' '
+    mov ah, 0x0e
+    int 0x10
+
+    push word [bp+8]
+    call print_int
+
+    mov al, ':'
+    mov ah, 0x0e
+    int 0x10
+
+    push word [bp+0xa]
+    call print_int
+
+    mov al, 0x0a
+    mov ah, 0x0e
+    int 0x10
+    mov al, 0x0d
+    mov ah, 0x0e
+    int 0x10
+%endif
 
     pop bp
     ret 0x8
@@ -177,6 +231,9 @@ get_size:
 	get_size_exit:
 		ret
 
+cmp_str:
+    ret
+
 ; Scans the disk (starting from sector 1 to find the file) to seek for the file with the name pointed to by si
 ; Return values
 ; AX = Sector #
@@ -191,7 +248,7 @@ find_file:
         push TEMP_SEGMENT
         push 0x01 ; only reading 1 sector
         push ax ; block #
-        call loadsector_lba
+        call loadsectors_lba
 
         pop ax ; get the current sector back
 
@@ -210,21 +267,66 @@ find_file:
 
     ret
 
+; Provide file in SI, and push offset then segment
+load_file:
+    push bp
+    mov bp, sp
+
+    call find_file
+
+%if 0
+    push ax
+    push bx
+
+    push ax
+    call print_int
+
+    mov ah, 0x0e
+    mov al, 0x20
+    int 0x10
+
+    push si
+    call puts
+
+    mov ah, 0x0e
+    mov al, 0x0a
+    int 0x10
+
+    mov ah, 0x0e
+    mov al, 0x0d
+    int 0x10
+
+    pop bx
+    pop ax
+%endif
+
+    push bx
+
+    push word [bp+6]
+    push word [bp+4]
+    push bx
+    push ax
+    call loadsectors_lba
+
+    pop ax
+
+    pop bp
+    ret 0x4
+
 kernel_sectors: dw 0
-core_sectors: dw 0
+ramdisk_sectors: dw 0
 
 disk_num: db 0
 sectors_per_track: dw 0
 num_heads: dw 0
 
+welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
+
 kernel_name: db "kernel.bin", 0
-core_name: db "ramdisk.tar", 0
+ramdisk_name: db "ramdisk.tar", 0
 stage2_name: db "stage2.bin", 0
 
-welcome_msg: db "Stage 1 located Stage 2 at ", 0
-
 charset: db "0123456789ABCDEF"
-number: dw 0x1234
 
 times 510-($-$$) db 0
 db 0x55, 0xaa
@@ -232,4 +334,4 @@ db 0x55, 0xaa
 KERNEL_SEGMENT equ 0x1000
 STAGE2_SEGMENT equ 0x07E0
 RAMDISK_SEGMENT equ 0x2000
-TEMP_SEGMENT equ 0x07E0
+TEMP_SEGMENT equ 0x3000

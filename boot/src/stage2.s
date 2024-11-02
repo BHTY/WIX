@@ -4,6 +4,16 @@
 push welcome_msg
 call puts
 
+mov ah, 0x88
+int 0x15
+mov word [mem_size], ax
+
+push ax
+call print_int
+
+push mb_msg
+call puts
+
 cli
 lgdt [GDT_Descriptor]
 mov eax, cr0
@@ -59,6 +69,30 @@ puts:
         pop bp
         ret 0x2
 
+print_int:
+    push bp
+    mov bp, sp
+    mov ax, word [bp+4]
+    xor dx, dx
+    mov cx, 0x1000
+    mov bx, charset
+
+    print_int_loop:
+        div cx
+        mov ah, 0x0e
+        xlat
+        int 0x10
+        mov ax, dx
+        xor dx, dx
+        shr cx, 4
+        cmp cx, 0
+        jne print_int_loop
+
+    pop bp
+    ret 0x2
+
+charset: db "0123456789ABCDEF"
+
 [bits 32]
 start_protected_mode:
 	mov ax, DATA_SEG
@@ -102,4 +136,9 @@ fill_pt:
     
     ret
 
-welcome_msg: db "Welcome to stage 2!", 0
+welcome_msg: db "Welcome to stage 2!", 0x0a, 0x0d, 0
+mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
+
+kernel_sectors: dw 0
+ramdisk_sectors: dw 0
+mem_size: dw 0
