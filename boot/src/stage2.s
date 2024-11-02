@@ -119,6 +119,11 @@ start_protected_mode:
 
     mov byte [0xb8000], 'B'
 
+    movsx eax, word [mem_size]
+    push eax
+    push test_str
+    call printf
+
     jmp $
 
 fill_pt:
@@ -136,9 +141,153 @@ fill_pt:
     
     ret
 
+test_str: db "Hello from Protected Mode! %x KB Memory", 0
+
+print_dec:
+print_hex:
+    push ebp
+    mov ebp, esp
+    mov eax, dword [ebp+0x8]
+    xor edx, edx
+    mov ecx, 0x10000000
+    mov ebx, charset
+
+    print_hex_loop:
+        div ecx
+        xlat
+        push eax
+        call putc
+        mov eax, edx
+        xor edx, edx
+        shr ecx, 4
+        cmp ecx, 0
+        jne print_hex_loop
+
+    pop ebp
+    ret 0x4
+
+printf: ; cdecl
+    push ebp
+    mov ebp, esp
+    mov ecx, 1
+
+    printf_loop:
+        mov eax, dword [ebp+0x8]
+        mov al, byte [eax]
+        inc dword [ebp+0x8]
+        cmp al, 0
+        je printf_done
+        cmp al, '%'
+        je printf_format
+        push eax
+        call putc
+        jmp printf_loop
+
+        printf_format:
+            mov eax, dword [ebp+0x8]
+            mov al, byte [eax]
+            push dword [ebp+0x8+ecx*4]
+
+            cmp al, 'c'
+            je printf_char
+            cmp al, 's'
+            je printf_str
+            cmp al, 'x'
+            je printf_hex
+            cmp al, 'd'
+            je printf_dec
+
+            printf_char:
+                call putc
+                jmp printf_format_done
+
+            printf_str:
+                call puts32
+                jmp printf_format_done
+
+            printf_hex:
+                call print_hex
+                jmp printf_format_done
+
+            printf_dec:
+                call print_dec
+                jmp printf_format_done
+
+            printf_format_done:
+                inc ecx
+                inc dword [ebp+0x8]
+        
+        jmp printf_loop
+
+    printf_done:
+        pop ebp
+        ret
+
+set_cursor:
+    ret
+
+scroll:
+    ret
+
+puts32:
+    push ebp
+    mov ebp, esp
+
+    puts32_loop:
+        mov esi, dword [ebp+0x8]
+        mov al, byte [esi]
+        cmp al, 0
+        je puts32_done
+        push eax
+        call putc
+        inc dword [ebp+0x8]
+        jmp puts32_loop
+
+    puts32_done:
+    pop ebp
+    ret 0x4
+
+putc:
+    push ebp
+    mov ebp, esp
+
+    mov al, byte [ebp+0x8]
+
+    cmp al, 0xa
+    je newline
+
+    cmp dword [vp_pos], SCREEN_SIZE
+    jl no_scroll
+    sub dword [vp_pos], ROWS
+    call scroll
+
+    no_scroll:
+    mov esi, dword [vp_pos]
+    mov byte [VIDEO_PTR+esi*2], al
+    mov al, byte [current_attr]
+    mov byte [VIDEO_PTR+esi*2+1], al
+    inc dword [vp_pos]
+
+    jmp end_putc
+
+newline:
+
+end_putc:
+    call set_cursor
+
+    pop ebp
+    ret 0x4
+
 welcome_msg: db "Welcome to stage 2!", 0x0a, 0x0d, 0
 mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
 
 kernel_sectors: dw 0
 ramdisk_sectors: dw 0
 mem_size: dw 0
+
+ROWS equ 80
+COLUMNS equ 25
+SCREEN_SIZE equ ROWS*COLUMNS
+VIDEO_PTR equ 0xB8000
+vp_pos: dd 0
+current_attr: db 0x7

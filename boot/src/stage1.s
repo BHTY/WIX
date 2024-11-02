@@ -19,8 +19,8 @@ mov [num_heads], dh
 and cl, 0x3f
 mov [sectors_per_track], cl
 
-push welcome_msg
-call puts
+;push welcome_msg
+;call puts
 
 ; load stage2.bin
 mov si, stage2_name
@@ -161,7 +161,7 @@ loadsector_lba:
 
     call loadsector
 
-%if 0
+%if 1
     push word [bp+4]
     call print_int
 
@@ -231,9 +231,6 @@ get_size:
 	get_size_exit:
 		ret
 
-cmp_str:
-    ret
-
 ; Scans the disk (starting from sector 1 to find the file) to seek for the file with the name pointed to by si
 ; Return values
 ; AX = Sector #
@@ -255,10 +252,31 @@ find_file:
         ; determine file size
         call get_size
 
+        push si
+        push TEMP_SEGMENT
+        pop es
+        xor di, di
+
+        find_file_strcmp_loop:
+            mov cl, byte [ds:si]
+            mov dl, byte [es:di]
+            cmp cl, 0
+            je find_file_strcmp_loop_done
+            inc di
+            inc si
+            cmp cl, dl
+            je find_file_strcmp_loop
+        
+        find_file_strcmp_loop_done:
+            sub cl, dl
+
         ; compare the filename to what we're seeking for
-        jmp find_file_exit
+        pop si
+
+        je find_file_exit
 
         add ax, bx
+        inc ax
         jmp find_file_loop
     
     find_file_exit:
@@ -274,7 +292,7 @@ load_file:
 
     call find_file
 
-%if 0
+%if 1
     push ax
     push bx
 
@@ -320,10 +338,10 @@ disk_num: db 0
 sectors_per_track: dw 0
 num_heads: dw 0
 
-welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
+;welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
 
 kernel_name: db "kernel.bin", 0
-ramdisk_name: db "ramdisk.tar", 0
+;ramdisk_name: db "ramdisk.tar", 0
 stage2_name: db "stage2.bin", 0
 
 charset: db "0123456789ABCDEF"
