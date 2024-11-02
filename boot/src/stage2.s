@@ -124,6 +124,8 @@ start_protected_mode:
     push test_str
     call printf
 
+    jmp 0x10000
+
     jmp $
 
 fill_pt:
@@ -194,8 +196,7 @@ printf: ; cdecl
             je printf_str
             cmp al, 'x'
             je printf_hex
-            cmp al, 'd'
-            je printf_dec
+            jmp printf_loop
 
             printf_char:
                 call putc
@@ -207,10 +208,6 @@ printf: ; cdecl
 
             printf_hex:
                 call print_hex
-                jmp printf_format_done
-
-            printf_dec:
-                call print_dec
                 jmp printf_format_done
 
             printf_format_done:

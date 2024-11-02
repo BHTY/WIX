@@ -192,6 +192,7 @@ loadsector_lba:
     mov al, 0x0d
     mov ah, 0x0e
     int 0x10
+
 %endif
 
     pop bp
@@ -204,13 +205,13 @@ loadsector_lba:
 get_size:
     push TEMP_SEGMENT
     pop es
-    mov cl, 12
+    mov cl, 11
 	mov di, 0x7C
 	xor bx, bx
 	xor dx, dx
 
 	get_size_loop:
-		shl bx, 3
+        shl bx, 3
 		mov dl, BYTE [es:di]
 		sub dl, 48
 		add bx, dx
@@ -220,7 +221,7 @@ get_size:
 		jne get_size_loop
 
 	get_size_done:
-		mov cx, bx
+        mov cx, bx
 		and cx, 0x1FF
 		shr bx, 9
 		cmp cx, 0
