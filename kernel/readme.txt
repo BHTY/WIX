@@ -1,8 +1,7 @@
 Kernel stuff
-1.) Initialize ISRs (set interrupt vector for the PIT)
-2.) Task switching
+1.) Interrupt handling
+2.) Task/thread switching
 3.) Memory manager
-4.) HEADERS!!!!!!!
 
 
 

@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 
 typedef uintptr_t paddr_t;
 typedef uintptr_t vaddr_t;

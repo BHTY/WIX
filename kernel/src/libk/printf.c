@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 uint32_t ilog(uint32_t num, uint32_t base){
     uint32_t t = 0;
@@ -94,7 +95,7 @@ int vsprintf(char* buf, const char* fmt, va_list args){
 				str += numtostr(str, va_arg(args, int), 16, 1);
 				break;
 			case 'p':
-				str += numtostr(str, (int)(va_arg(args, void*)), 16, 0);
+				str += numtostr(str, (uint32_t)(va_arg(args, void*)), 16, 0);
 				break;
 			case 'd':
 			case 'i':

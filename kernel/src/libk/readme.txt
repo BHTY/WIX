@@ -16,4 +16,4 @@ int atoi(const char *str);
 
     stdio.h
 int vsprintf(char *str, const char *format, va_list arg);           DONE
-int sprintf(char *str, const char *format, ...);
+int sprintf(char *str, const char *format, ...);                    DONE

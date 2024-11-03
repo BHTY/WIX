@@ -11,10 +11,10 @@ SFILES			:= $(shell find $(SRCDIR) -type f -name "*.s")
 
 OBJFILES		:= $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(CFILES)) $(patsubst $(SRCDIR)/%.s,$(BUILDDIR)/%.o,$(SFILES))
 
+override CFLAGS := $(CFLAGS) -Iinclude/libk -Iinclude
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 		$(CC) $(CFLAGS) $< -o $@
-		echo hi
 $(BUILDDIR)/%.o: $(SRCDIR)/%.s
 		$(ASM) $< -f elf -o $@
 
