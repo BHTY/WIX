@@ -147,6 +147,7 @@ loadsector_lba:
     div word [sectors_per_track] ; quotient(AX) = temp value, rem(DX)=sector-1
     mov bx, dx ; moving sector #-1 into bx
     inc bx
+    xor dx, dx
 
     div word [num_heads] ;quotient(AX) = cylinder #, rem(DX) = head #
 

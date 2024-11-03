@@ -156,8 +156,10 @@ print_hex:
     print_hex_loop:
         div ecx
         xlat
+        push edx
         push eax
         call putc
+        pop edx
         mov eax, edx
         xor edx, edx
         shr ecx, 4
@@ -187,6 +189,7 @@ printf: ; cdecl
         printf_format:
             mov eax, dword [ebp+0x8]
             mov al, byte [eax]
+            push ecx
             push dword [ebp+0x8+ecx*4]
 
             cmp al, 'c'
@@ -210,6 +213,7 @@ printf: ; cdecl
                 jmp printf_format_done
 
             printf_format_done:
+                pop ecx
                 inc ecx
                 inc dword [ebp+0x8]
         
@@ -226,7 +230,6 @@ printf: ; cdecl
 %endmacro
 
 set_cursor:
-    ret
     outb 0x3d4, 14
     mov eax, dword [vp_pos]
     shr eax, 8
@@ -280,24 +283,36 @@ putc:
     push ebp
     mov ebp, esp
 
+    mov dx, SERIAL_PORT+5
+   
+    wait_transmit_empty:
+        in al, dx
+        test al, 0x20
+        je wait_transmit_empty
+
+    mov al, byte [ebp+0x8]
+    mov dx, SERIAL_PORT
+    out dx, al
+
+    pop ebp
+    ret 0x4
+
+putc_video:
+    push ebp
+    mov ebp, esp
+
     mov al, byte [ebp+0x8]
 
     cmp al, 0xa
     je newline
 
-    cmp dword [vp_pos], SCREEN_SIZE
-    jl no_scroll
-    sub dword [vp_pos], ROWS
-    call scroll
-
-    no_scroll:
+    ; place character into video buffer
     mov esi, dword [vp_pos]
     mov byte [VIDEO_PTR+esi*2], al
     mov al, byte [current_attr]
     mov byte [VIDEO_PTR+esi*2+1], al
     inc dword [vp_pos]
-
-    jmp end_putc
+    jmp after_newline
 
 newline:
     xor edx, edx
@@ -306,6 +321,12 @@ newline:
     div ebx
     sub dword [vp_pos], edx
     add dword [vp_pos], ROWS
+
+after_newline:
+    cmp dword [vp_pos], SCREEN_SIZE
+    jl end_putc
+    sub dword [vp_pos], ROWS
+    call scroll
 
 end_putc:
     call set_cursor
@@ -323,6 +344,8 @@ ramdisk_sectors: dw 0xDEAD
 mem_size: dw 0xBEEF
 dw 0
 printf_addr: dd printf
+
+SERIAL_PORT equ 0x3F8
 
 ROWS equ 80
 COLUMNS equ 25

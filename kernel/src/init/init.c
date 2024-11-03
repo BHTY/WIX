@@ -1,3 +1,9 @@
+/* 
+    Copyright (C) 2024 WIX Kernel
+    Authored by Will Klees
+    init.c - Kernel initialization
+*/
+
 #include <stdint.h>
 
 typedef struct kernel_startup_params {
@@ -9,27 +15,17 @@ typedef struct kernel_startup_params {
 
 void pmm_init();
 uint32_t commit_page();
+int sprintf(char* str, const char* format, ...);
 
 void _start(kernel_startup_params_t* params){
-    int pages = 0;
-    uint32_t pfn;
-
+    char buf[40];
     pmm_init();
 
-    params->printf("\nWelcome to the WIX kernel!\nBuilt %s %s\nMemory size: %xKB\n", __DATE__, __TIME__, params->mem_size);
+    params->printf("\nWelcome to the WIX kernel!\nBuilt %s %s\n", __DATE__, __TIME__);
+    sprintf(buf, "%d KB Extended Memory\n", params->mem_size);
+    params->printf(buf);
 
-    
-    /*for(int i = 0; i < 32; i++){
-        pfn = commit_page();
-        params->printf("Allocated page at 0x%x (%x)\n", pfn << 12, i);
-    }*/
-    
-
-    while((pfn = commit_page()) != 0xFFFFFFFF){
-        params->printf("Allocated page at 0x%x\n", pfn << 12);
-        pages++;
+    while(1){
+        (*(unsigned char*)(0xB8000))++;
     }
-
-    params->printf("Failed to allocate after allocating %x %x pages\n", pages, pages);
-    while(1);
 }
