@@ -91,8 +91,6 @@ print_int:
     pop bp
     ret 0x2
 
-charset: db "0123456789ABCDEF"
-
 [bits 32]
 start_protected_mode:
 	mov ax, DATA_SEG
@@ -124,7 +122,8 @@ start_protected_mode:
     push test_str
     call printf
 
-    jmp 0x10000
+    push kernel_sectors
+    call 0x10000
 
     jmp $
 
@@ -220,10 +219,43 @@ printf: ; cdecl
         pop ebp
         ret
 
+%macro outb 2
+    mov dx, %1
+    mov al, %2
+    out dx, al
+%endmacro
+
 set_cursor:
+    ret
+    outb 0x3d4, 14
+    mov eax, dword [vp_pos]
+    shr eax, 8
+    outb 0x3d5, al
+    outb 0x3d4, 15
+    mov eax, dword [vp_pos]
+    outb 0x3d5, al
     ret
 
 scroll:
+    mov ebx, 0
+    scroll_loop:
+        mov eax, ROWS*2
+        mul ebx
+        add eax, VIDEO_PTR
+
+        mov edi, eax
+        mov esi, edi
+        add esi, ROWS*2
+        
+        mov ecx, ROWS / 2
+        rep movsd
+        inc ebx
+        cmp ebx, ROWS
+        jl scroll_loop
+
+    mov eax, 0
+    mov edi, VIDEO_PTR + (COLUMNS-1)*ROWS*2
+    rep stosd
     ret
 
 puts32:
@@ -268,6 +300,12 @@ putc:
     jmp end_putc
 
 newline:
+    xor edx, edx
+    mov eax, dword [vp_pos]
+    mov ebx, ROWS
+    div ebx
+    sub dword [vp_pos], edx
+    add dword [vp_pos], ROWS
 
 end_putc:
     call set_cursor
@@ -278,13 +316,17 @@ end_putc:
 welcome_msg: db "Welcome to stage 2!", 0x0a, 0x0d, 0
 mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
 
+charset: db "0123456789ABCDEF"
+
 kernel_sectors: dw 0
-ramdisk_sectors: dw 0
-mem_size: dw 0
+ramdisk_sectors: dw 0xDEAD
+mem_size: dw 0xBEEF
+dw 0
+printf_addr: dd printf
 
 ROWS equ 80
 COLUMNS equ 25
 SCREEN_SIZE equ ROWS*COLUMNS
 VIDEO_PTR equ 0xB8000
 vp_pos: dd 0
-current_attr: db 0x7
+current_attr: db 0x17
