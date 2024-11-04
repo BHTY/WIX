@@ -1,8 +1,11 @@
-Kernel stuff
-1.) Task/thread switching
-2.) Virtual memory manager
-3.) Kernel heap
-
+Todo List
+1.) Fix... so many bugs
+2.) Thread cleanup
+3.) User mode
+4.) Sleep queues / blocking / synch objects
+    Mutex
+    Critical Section
+5.) Slab allocator
 
 MEMORY MANAGEMENT
 Applications dynamically allocate memory by requesting it from the system via the sbrk(int) system call, which raises the program break, extending the heap, and returning the new program break.

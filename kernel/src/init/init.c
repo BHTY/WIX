@@ -35,7 +35,7 @@ void task_switch();
 void test_int();
 
 uint32_t pit_isr(int_state_t* state){
-    dbg_printf("Hello! ESP=%x [%x]\n", state->esp, *(uint32_t*)state->esp);
+    //dbg_printf("Hello! ESP=%x [%x]\n", state->esp, *(uint32_t*)state->esp);
     pic_send_eoi(0);
     task_switch();
     return 0;
@@ -46,16 +46,22 @@ void init_tasking(){
     base_task.next = cur_task;
 }
 
+void thread_exit(){
+    disable_interrupts();
+    dbg_printf("Thread exit!\n");
+    while(1);
+}
+
 void thread_fun_1(void* param){
     while (1){
-        dbg_printf("Nicole");
+        dbg_printf("A");
         //task_switch();
     }
 }
 
 void thread_fun_2(void* param){
     while (1){
-        dbg_printf("Will");
+        dbg_printf("B");
     }
 }
 
@@ -63,6 +69,7 @@ void create_thread(task_t* task, thread_func_t fn, void* param){
     uint32_t* stack = heap_alloc(4096) + 4096;
 
     stack--; *stack = param;
+    stack--; *stack = thread_exit;
     stack--; *stack = fn;
     stack--; *stack = 0x202; //eflags
     stack--; *stack = 0;
@@ -107,6 +114,12 @@ void _start(kernel_startup_params_t* params){
     set_isr(0x70, pit_isr);
 
     map_page(0x30000, 0xB8000, 0x200000);
+
+    io_write_8(0x43, 52);
+	//outp(0x40, 0x95);
+	//outp(0x40, 0x42);
+	io_write_8(0x40, 0xdf);
+	io_write_8(0x40, 0x4);
 
     spawn_thread(thread_fun_1, 0);
     spawn_thread(thread_fun_2, 0);
