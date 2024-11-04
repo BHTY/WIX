@@ -15,5 +15,5 @@ void map_page(pgdir_t* page_dir, paddr_t paddr, vaddr_t vaddr){
     pgtable_t* page_table = page_dir->entries[pd_entry] & 0xFFFFF000;
     page_table->entries[pt_entry] = paddr | 7;
 
-    dbg_printf("[VADDR] Mapped physical address %x to linear address %x\n", paddr, vaddr);
+    dbg_printf("[VMM] Mapped physical address %x to linear address %x\n", paddr, vaddr);
 }

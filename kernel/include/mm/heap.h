@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+void heap_print();
 void heap_init();
 void* heap_alloc(size_t sz);
 void heap_free(void* ptr);

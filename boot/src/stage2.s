@@ -144,7 +144,7 @@ fill_pt:
     
     ret
 
-test_str: db "Hello from Protected Mode! %x KB Memory", 0
+test_str: db "Hello from Protected Mode! %x KB Memory", 0x0a, 0
 
 print_dec:
 print_hex:
@@ -200,6 +200,9 @@ printf: ; cdecl
             je printf_str
             cmp al, 'x'
             je printf_hex
+            push '%'
+            call putc
+            pop ecx
             jmp printf_loop
 
             printf_char:
@@ -299,7 +302,7 @@ putc:
     pop ebp
     ret 0x4
 
-putc_video:
+putc_serial:
     push ebp
     mov ebp, esp
 

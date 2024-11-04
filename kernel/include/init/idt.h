@@ -31,3 +31,5 @@ __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags);
 void idt_init(void);
 void idt_enable();
+void enable_interrupts();
+void disable_interrupts();

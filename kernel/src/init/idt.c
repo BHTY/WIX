@@ -27,7 +27,7 @@ isr_func set_isr(int index, isr_func new_func){
 /* Base interrupt handler */
 __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state){
     if (isr_table[code]){
-        return isr_table[code](&state);
+        isr_table[code](&state);
     } else{
         dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\n", code);
         while(1);
@@ -60,5 +60,13 @@ void idt_init() {
     }
  
     __asm__ volatile ("lidt %0" : : "m"(idtr)); // load the new IDT
+    enable_interrupts();
+}
+
+void enable_interrupts(){
     __asm__ volatile ("sti"); // set the interrupt flag
+}
+
+void disable_interrupts(){
+    __asm__ volatile ("cli"); // clear the interrupt flag
 }
