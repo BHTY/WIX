@@ -24,27 +24,29 @@ jmp CODE_SEG:start_protected_mode
 
 jmp $
 
-CODE_SEG equ code_descriptor - GDT_Start
-DATA_SEG equ data_descriptor - GDT_Start
+CODE_SEG equ kernel_code_descriptor - GDT_Start
+DATA_SEG equ kernel_data_descriptor - GDT_Start
 
 GDT_Start:
 	null_descriptor:
 		dd 0
 		dd 0
-	code_descriptor:
+	kernel_code_descriptor:
 		dw 0xffff
 		dw 0
 		db 0
 		db 0x9a
 		db 0xcf
 		db 0
-	data_descriptor:
+	kernel_data_descriptor:
 		dw 0xffff
 		dw 0
 		db 0
 		db 0x92
 		db 0xcf
 		db 0
+    user_code_descriptor:
+    user_data_descriptor:
 	GDT_End:
 
 GDT_Descriptor:

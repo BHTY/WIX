@@ -1,8 +1,7 @@
 Kernel stuff
-1.) Interrupt handling
-2.) Task/thread switching
-3.) Memory manager
-
+1.) Task/thread switching
+2.) Virtual memory manager
+3.) Kernel heap
 
 
 MEMORY MANAGEMENT

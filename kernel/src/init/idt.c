@@ -5,6 +5,7 @@
 */
 
 #include <stdint.h>
+#include <string.h>
 #include <init/idt.h>
 #include <init/io.h>
 #include <init/pic.h>
@@ -13,12 +14,30 @@ __attribute__((aligned(0x10))) static idt_entry_t idt[256];
 
 static idtr_t idtr;
 
-void (*print)(const char*, ...) = 0;
+void (*dbg_printf)(const char*, ...) = 0;
 
-__attribute__((noreturn)) void exception_handler(int code, int_state_t state){
-    print("Interrupt %x :: %x\n", code, state.eax);
+isr_func isr_table[256] = {0};
 
-    if(code >= 0x70) pic_send_eoi(code);
+isr_func set_isr(int index, isr_func new_func){
+    isr_func old_func = isr_table[index];
+    isr_table[index] = new_func;
+    return old_func;
+}
+
+/* Base interrupt handler */
+__attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state){
+    if (isr_table[code]){
+        return isr_table[code](&state);
+    } else{
+        dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\n", code);
+        while(1);
+    }
+}
+
+/* Base exception handler */
+__attribute__((noreturn)) uint32_t exception_handler(int code, uint32_t error_code){
+    dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
+    while(1);
 }
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {

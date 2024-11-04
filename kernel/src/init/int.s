@@ -2,11 +2,9 @@
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
-    pusha
-	push %1
+    push %1
 	call exception_handler
-	add esp, 4
-    popa
+	add esp, 8
 	iret
 %endmacro
 
@@ -14,19 +12,19 @@ isr_stub_%+%1:
 isr_stub_%+%1:
     pusha
 	push %1
-	call exception_handler
-	add esp, 4
-    popa
+	call interrupt_handler
+	add esp, 36
 	iret
 %endmacro
 
 global test_int
 test_int:
     mov eax, 0x10101010
-    int 0x10
+    int 0x80
     ret
 
 extern exception_handler
+extern interrupt_handler
 isr_no_err_stub 0
 isr_no_err_stub 1
 isr_no_err_stub 2

@@ -6,6 +6,7 @@
 
 #include <init/pic.h>
 #include <init/io.h>
+#include <init/idt.h>
 
 /* Sends the EOI signal for an IRQ to the PIC */
 void pic_send_eoi(uint8_t irq){
