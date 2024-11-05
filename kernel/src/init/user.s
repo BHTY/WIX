@@ -22,5 +22,10 @@ jump_usermode:
 
 test_user_function:
     inc byte [0xb8000]
-    ;int 0x80
+    mov eax, 0xDEADBEEF
+    int 0x80
+    ;not eax
+    int 0x80
+    mov eax, 0xCAFEBABE
+    int 0x80
     jmp test_user_function

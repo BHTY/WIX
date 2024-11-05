@@ -27,9 +27,10 @@ isr_func set_isr(int index, isr_func new_func){
 /* Base interrupt handler */
 __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state){
     if (isr_table[code]){
-        isr_table[code](&state);
+        uint32_t ret_val = isr_table[code](&state);
+        return ret_val;
     } else{
-        dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\n", code);
+        dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\nEAX=%x\n", code, state.eax);
         while(1);
     }
 }

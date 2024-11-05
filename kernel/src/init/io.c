@@ -37,7 +37,7 @@ void io_write_16(uint32_t port, uint16_t data)
 /* Read a dword from an I/O port */
 uint32_t io_read_32(uint32_t port)
 {
-	uint32_t rv;
+    uint32_t rv;
 	__asm__ volatile ("inl %1, %0" : "=a" (rv) : "dN" ((uint16_t)port));
 	return rv;
 }

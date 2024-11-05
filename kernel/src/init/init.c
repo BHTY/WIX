@@ -37,9 +37,15 @@ void test_int();
 
 uint32_t pit_isr(int_state_t* state){
     //dbg_printf("Hello! ESP=%x [%x]\n", state->esp, *(uint32_t*)state->esp);
+    dbg_printf("\nContext switch\n");
     pic_send_eoi(0);
     task_switch();
     return 0;
+}
+
+uint32_t syscall_handler(int_state_t* state){
+    dbg_printf("System call %x\n", state->eax);
+    return 0x0BADF00D;
 }
 
 void init_tasking(){
@@ -55,14 +61,14 @@ void thread_exit(){
 
 void thread_fun_1(void* param){
     while (1){
-        dbg_printf("A");
+        //dbg_printf("A");
         //task_switch();
     }
 }
 
 void thread_fun_2(void* param){
     while (1){
-        dbg_printf("B");
+        //dbg_printf("B");
     }
 }
 
@@ -114,7 +120,8 @@ void _start(kernel_startup_params_t* params){
     pic_remap(0x70, 0x78);
     idt_init();
     set_isr(0x70, pit_isr);
-
+    set_isr(0x80, syscall_handler);
+    
     gdt_init();
 
     map_page(0x30000, 0xB8000, 0x200000);
