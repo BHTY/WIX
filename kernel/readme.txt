@@ -1,23 +1,29 @@
 Todo List
-1.) Fix... so many bugs (kheap)
-2.) Thread cleanup
-3.) Sleep queues / blocking / synch objects
-    Mutex
-    Critical Section
-4.) Slab allocator (for threads and stuff)
-5.) Multiple address spaces
 
-Kernel debugger
+=== BUG FIXES ===
+Kernel heap
 
-Fixing user mode
-- Syscalls
-- Swapping kernel stacks
 
-Loading additional processes
+=== MULTITHREADING ===
+Improve the timeslice scheduler
 
-Superior timeslice scheduler
+Thread cleanup
 
-TTY/bootvid (ANSI?)
+Block List
+Sleep queues for synchronization objects
+Wait on a mutex / critical section
+
+Multiple address spaces
+
+
+=== SLAB ALLOCATOR ===
+For threads and stuff
+
+
+=== OTHER ===
+- Kernel debugger
+- Loading additional processes
+
 
 MEMORY MANAGEMENT
 Applications dynamically allocate memory by requesting it from the system via the sbrk(int) system call, which raises the program break, extending the heap, and returning the new program break.

@@ -181,7 +181,6 @@ void tty_write(const void* buf, size_t count){
     char* str = buf;
 
     while(count--){
-        //dbg_printf("%c", *str++);
         proc_char(*str++);
     }
 }

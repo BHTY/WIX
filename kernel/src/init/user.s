@@ -1,3 +1,12 @@
+struc TASK 
+  .esp:        resd    1 
+  .next:       resd    1 
+  .prev:       resd    1 
+  .user_esp:   resd    1
+endstruc
+
+extern cur_task
+
 global jump_usermode
 global test_user_function
 jump_usermode:
@@ -15,21 +24,29 @@ jump_usermode:
     ;jmp $
 
 	; set up the stack frame iret expects
-	mov eax, esp
+    mov eax, dword [cur_task]
+    mov eax, [eax+TASK.user_esp] ; get the user mode stack
     push ebx
 	push (4 * 8) | 3 ; data selector
 	push eax ; current esp
 	pushf ; eflags
 	push (3 * 8) | 3 ; code selector (ring 3 code with bottom 2 bits set for ring 3)
 	push ecx ; instruction address to return to
+    ;jmp $
 	iret
 
 test_user_function:
+    int 0x80
+    push 1
+    pop eax
     inc byte [0xb8000]
+    jmp test_user_function
+    jmp $
     mov eax, 0xDEADBEEF
     int 0x80
     ;not eax
     int 0x80
     mov eax, 0xCAFEBABE
     int 0x80
+    push 1  
     jmp test_user_function

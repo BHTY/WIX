@@ -104,10 +104,12 @@ start_protected_mode:
 
     mov byte [0xb8000], 'A'
 
-    mov eax, 0x31007
-    mov [0x30000], eax
+    mov dword [0x30000], 0x31007
+    mov dword [0x30800], 0x32007
 
     call fill_pt
+
+    call map_kernel
 
     ; enable paging
     mov eax, 0x30000
@@ -127,6 +129,22 @@ start_protected_mode:
     call 0x10000
 
     jmp $
+
+map_kernel:
+    xor eax, eax
+
+    map_kernel_loop:
+        mov ebx, eax
+        shl ebx, 12
+        add ebx, 0x10000
+        or ebx, 7
+        mov [eax * 4 + 0x32000], ebx
+
+        inc eax
+        cmp eax, 16
+        jne map_kernel_loop
+
+    ret
 
 fill_pt:
     xor eax, eax

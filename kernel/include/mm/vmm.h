@@ -15,3 +15,4 @@ typedef struct pgtable {
 } pgtable_t;
 
 void map_page(pgdir_t* page_dir, paddr_t paddr, vaddr_t vaddr);
+void unmap_page(pgdir_t* page_dir, vaddr_t vaddr);

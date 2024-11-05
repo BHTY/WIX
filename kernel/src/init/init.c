@@ -12,6 +12,8 @@
 #include <mm/vmm.h>
 #include <stdio.h>
 
+int interrupt_tick = 0;
+
 typedef struct kernel_startup_params {
     uint16_t kernel_sectors;
     uint16_t ramdisk_sectors;
@@ -45,6 +47,7 @@ uint32_t pit_isr(int_state_t* state){
     // push regs
     //dbg_printf("\nContext switch: ");
     //dump_regs(state);
+    interrupt_tick++;
     pic_send_eoi(0);
     //dbg_printf("EOI sent\n");
     task_switch(state);
@@ -53,12 +56,19 @@ uint32_t pit_isr(int_state_t* state){
 
 uint32_t syscall_handler(int_state_t* state){
     //dbg_printf("System call %x\n", state->eax);
-    return 0x0BADF00D;
+
+    if(state->eax == 0x01){
+        print(state->ebx);
+    }
+
+    //while(1);
+    return 0;
 }
 
 void init_tasking(){
     cur_task = &base_task;
     base_task.next = cur_task;
+    base_task.esp0 = 0xDEADBEEF;
 }
 
 void thread_exit(){
@@ -67,23 +77,23 @@ void thread_exit(){
     while(1);
 }
 
-void thread_fun_1(void* param){
+/*void thread_fun_1(void* param){
     while (1){
         dbg_printf("A");
         //task_switch();
     }
-}
+}*/
 
-void thread_fun_2(void* param){
+/*void thread_fun_2(void* param){
     while (1){
         dbg_printf("B");
     }
-}
+}*/
 
 void thread_fun_1(void* param);
 void thread_fun_2(void* param);
 
-void create_thread(task_t* task, thread_func_t fn, void* param){
+void create_thread(task_t* task, thread_func_t fn, void* param, int user_esp){
     uint32_t* stack = heap_alloc(4096) + 4096;
 
     stack--; *stack = param;
@@ -99,9 +109,13 @@ void create_thread(task_t* task, thread_func_t fn, void* param){
     stack--; *stack = 0;
 
     task->esp = stack;
+
+    if (user_esp){
+        task->esp0 = heap_alloc(4096) + 4096;
+    }
 }
 
-task_t* spawn_thread(thread_func_t fn, void* param){
+task_t* spawn_thread(thread_func_t fn, void* param, int user_esp){
     disable_interrupts();
     task_t* temp = cur_task->next;
     cur_task->next = heap_alloc(sizeof(task_t));
@@ -111,7 +125,7 @@ task_t* spawn_thread(thread_func_t fn, void* param){
 
     if(!cur_task->prev) cur_task->prev = temp;
 
-    create_thread(cur_task->next, fn, param);
+    create_thread(cur_task->next, fn, param, user_esp);
 
     dbg_printf("About to enable interrupts\n");
 
@@ -126,7 +140,8 @@ void test_user_function();
 void bootvid_fill(uint16_t start, uint16_t end);
 
 void print(char* str){
-    tty_write(str, strlen(str));
+    //tty_write(str, strlen(str));
+    dbg_printf(str);
 }
 
 void _start(kernel_startup_params_t* params){
@@ -146,7 +161,7 @@ void _start(kernel_startup_params_t* params){
     
     gdt_init();
 
-    map_page(0x30000, 0xB8000, 0x200000);
+    unmap_page(0x30000, 0x0);
 
     io_write_8(0x43, 52);
 	//outp(0x40, 0x95);
@@ -162,12 +177,23 @@ void _start(kernel_startup_params_t* params){
 
     //*(uint8_t*)(0x300000) = 0;
 
-    spawn_thread(thread_fun_1, 0);
-    spawn_thread(thread_fun_2, 0);
+    spawn_thread(thread_fun_1, 0, 1);
+    spawn_thread(thread_fun_2, 0, 1);
 
     //dbg_printf("Okay...\n");
 
     //jump_usermode(test_user_function, 0xF00F);
+
+    char* str1 = "\x1B[33m[\x1B[H\x1B[JWelcome to WIX!\nPress any key to cause a crash.\n";
+
+    tty_write(str1, strlen(str1));
+
+    while(1){
+        sprintf(buf, "\x0DTime: %d", interrupt_tick);
+        tty_write(buf, strlen(buf));
+        //tty_write("I'm a happy kernel mode task!\n", strlen("I'm a happy kernel mode task!\n"));
+        //print("I'm a happy kernel mode task!\n");
+    }
 
     while(1){
         sprintf(buf, "Hello %d\n", n++);

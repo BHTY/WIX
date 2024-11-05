@@ -24,15 +24,54 @@ isr_func set_isr(int index, isr_func new_func){
     return old_func;
 }
 
+void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, uint32_t eip){
+    char buf[80];
+
+    disable_interrupts();
+
+    tty_write("\x1B[41m\x1B[37m\x1B[2J\x1B[H", strlen("\x1B[41m\x1B[37m\x1B[2J\x1B[H")); // fill screen with red and set cursor
+
+    sprintf(buf, "UNRECOVERABLE EXCEPTION 0x%x CODE %x\n", code, error_code);
+    tty_write(buf, strlen(buf));
+
+    sprintf(buf, "FAULTING ADDRESS: %x:%x\n", cs, eip);
+    tty_write(buf, strlen(buf));
+
+    if (code == 0x0E){
+        uint32_t vaddr;
+        __asm__ volatile("movl %cr2, %eax");
+        __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
+
+        sprintf(buf, "PAGE FAULT ACCESSING 0x%x\n", vaddr);
+        tty_write(buf, strlen(buf));
+
+        //dbg_printf("Page fault accessing %x\n", vaddr);
+    }
+
+    if (code == 0x20){
+        sprintf(buf, "UNHANDLED INTERRUPT 0x%x\n", error_code);
+        tty_write(buf, strlen(buf));
+    }
+
+    tty_write("\n", 1);
+    crash_dump(buf, state);
+
+    //dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
+    
+    while(1);
+}
+
 /* Base interrupt handler */
 __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state){
     if (isr_table[code]){
         uint32_t ret_val = isr_table[code](&state);
         return ret_val;
     } else{
-        dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\nEAX=%x\n", code, state.eax);
-        *(unsigned int*)(0x300000) = 0;
-        while(1);
+        //dbg_printf("UNHANDLED INTERRUPT %x SYSTEM HALTED!\nEAX=%x\n", code, state.eax);
+        //*(unsigned int*)(0x300000) = 0;
+        //dbg_printf("fuck you\n");
+        //while(1);
+        bug_check(&state, 0x20, code, *(((uint32_t*)((&state + 1)))+1), *(uint32_t*)(&state + 1));
     }
 }
 
@@ -52,33 +91,7 @@ void crash_dump(char* buf, int_state_t* state){
 }
 
 __attribute__((noreturn)) uint32_t exception_handler(int code, int_state_t state, uint32_t error_code){
-    char buf[80];
-
-    tty_write("\x1B[41m\x1B[2J\x1B[H", 12); // fill screen with red and set cursor
-
-    sprintf(buf, "UNRECOVERABLE EXCEPTION 0x%x CODE %x\n", code, error_code);
-    tty_write(buf, strlen(buf));
-
-    sprintf(buf, "FAULTING ADDRESS: %x:%x\n", *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
-    tty_write(buf, strlen(buf));
-
-    if(code == 0x0E){
-        uint32_t vaddr;
-        __asm__ volatile("movl %cr2, %eax");
-        __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
-
-        sprintf(buf, "PAGE FAULT ACCESSING 0x%x\n", vaddr);
-        tty_write(buf, strlen(buf));
-
-        //dbg_printf("Page fault accessing %x\n", vaddr);
-    }
-
-    tty_write("\n", 1);
-    crash_dump(buf, &state);
-
-    //dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
-    
-    while(1);
+    bug_check(&state, code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
 }
 
 /* Base exception handler */

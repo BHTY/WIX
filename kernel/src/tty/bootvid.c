@@ -39,6 +39,8 @@ void bootvid_init(){
 void bootvid_putc(char ch){
     if (ch == 0x0A){
         bootvid_cursor = ROWS + (bootvid_cursor - (bootvid_cursor % ROWS));
+    } else if (ch == 0x0D) {
+        bootvid_cursor -= (bootvid_cursor % ROWS);
     } else {
         *(text_buffer + bootvid_cursor * 2) = ch;
         *(text_buffer + bootvid_cursor * 2 + 1) = text_attr;

@@ -27,11 +27,11 @@ isr_stub_%+%1:
 ;    mov byte [0xb8000], 'F'
 ;    jmp $
 
-global test_int
-test_int:
-    mov eax, 0x10101010
-    int 0x80
-    ret
+;global test_int
+;test_int:
+;    mov eax, 0x10101010
+;    int 0x80
+;    ret
 
 extern exception_handler
 extern interrupt_handler

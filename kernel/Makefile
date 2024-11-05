@@ -1,7 +1,7 @@
 BUILDDIR		:= build
 SRCDIR := src
 OUTPUT := kernel.bin
-ADDRESS := 0x10000
+ADDRESS := 0x80000000
 
 CC					:= $(CCBASE)-gcc
 ASM					:= nasm

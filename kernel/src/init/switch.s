@@ -2,11 +2,13 @@ struc TASK
   .esp:        resd    1 
   .next:       resd    1 
   .prev:       resd    1 
+  .esp0:       resd    1
 endstruc
 
 extern cur_task
 global task_switch
 
+extern tss_entry
 
 ; void task_switch(int_state_t*)
 task_switch:
@@ -30,6 +32,8 @@ task_switch:
     mov [cur_task], esi
 
     mov esp, [esi+TASK.esp]
+    mov ebx, [esi+TASK.esp0]
+    mov [tss_entry+4], ebx
 
     pop edi
     pop esi
@@ -43,9 +47,17 @@ task_switch:
     ret
 
 extern jump_usermode
+extern test_user_function
 
-;global thread_fun_1
+extern print
+
+global thread_fun_1
 thread_fun_1:
+    ;jmp $
+    push 0
+    push thread_fun_1_3
+    call jump_usermode
+
     ;push 0
     ;push thread_fun_1_3
     ;call jump_usermode
@@ -58,11 +70,29 @@ thread_fun_1:
     jmp $
 
 thread_fun_1_3:
-    jmp $
+    mov eax, 0x01
+    mov ebx, t1_string
+    int 0x80
+    ;mov eax, 0xDEADBEEF
+    ;int 0x80
+    jmp thread_fun_1_3
 
-;global thread_fun_2
+global thread_fun_2
 thread_fun_2:
-    inc byte [0xb8004]
-    jmp thread_fun_2
+    ;inc byte [0xb8004]
+    ;jmp thread_fun_2
+    push 0
+    push thread_fun_2_3
+    call jump_usermode
     jmp $
 
+thread_fun_2_3:
+    mov eax, 0x01
+    mov ebx, t2_string
+    int 0x80
+    ;mov eax, 0xCAFEBABE
+    ;int 0x80
+    jmp thread_fun_2_3
+
+t1_string: db "A", 0x00
+t2_string: db "B", 0x00
