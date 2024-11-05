@@ -301,7 +301,7 @@ putc:
     pop ebp
     ret 0x4
 
-putc_serial:
+putc_vga:
     push ebp
     mov ebp, esp
 

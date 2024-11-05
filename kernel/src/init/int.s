@@ -3,9 +3,11 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
     cli
+    pushfd
+    pusha
     push %1
 	call exception_handler
-	add esp, 8
+	add esp, 44
     sti
 	iret
 %endmacro

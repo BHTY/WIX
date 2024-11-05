@@ -52,7 +52,7 @@ uint32_t pit_isr(int_state_t* state){
 }
 
 uint32_t syscall_handler(int_state_t* state){
-    dbg_printf("System call %x\n", state->eax);
+    //dbg_printf("System call %x\n", state->eax);
     return 0x0BADF00D;
 }
 
@@ -67,18 +67,18 @@ void thread_exit(){
     while(1);
 }
 
-/*void thread_fun_1(void* param){
+void thread_fun_1(void* param){
     while (1){
-        //dbg_printf("A");
+        dbg_printf("A");
         //task_switch();
     }
 }
 
 void thread_fun_2(void* param){
     while (1){
-        //dbg_printf("B");
+        dbg_printf("B");
     }
-}*/
+}
 
 void thread_fun_1(void* param);
 void thread_fun_2(void* param);
@@ -123,8 +123,15 @@ task_t* spawn_thread(thread_func_t fn, void* param){
 void jump_usermode(uint32_t, uint32_t);
 void test_user_function();
 
+void bootvid_fill(uint16_t start, uint16_t end);
+
+void print(char* str){
+    tty_write(str, strlen(str));
+}
+
 void _start(kernel_startup_params_t* params){
     char buf[40];
+    int n = 0;
     pmm_init();
 
     dbg_printf = params->printf;
@@ -147,15 +154,24 @@ void _start(kernel_startup_params_t* params){
 	io_write_8(0x40, 0xdf);
 	io_write_8(0x40, 0x4);
 
+    //dbg_printf("\x1B[41m\x1B[2J\x1B[HFATAL ERROR\n");
+
+    tty_init();
+    //tty_write("\x1B[41m\x1B[2JHi\x1B[H", 14);
+    //bootvid_fill(0, 2000);
+
+    //*(uint8_t*)(0x300000) = 0;
+
     spawn_thread(thread_fun_1, 0);
     spawn_thread(thread_fun_2, 0);
 
     //dbg_printf("Okay...\n");
 
-    jump_usermode(test_user_function, 0xF00F);
+    //jump_usermode(test_user_function, 0xF00F);
 
     while(1){
-        
+        sprintf(buf, "Hello %d\n", n++);
+        tty_write(buf, strlen(buf));
     }
 
     params->printf("Welcome to the WIX kernel!\nBuilt %s %s\n", __DATE__, __TIME__);

@@ -13,6 +13,8 @@ size_t strlen(const char *str);                                     DONE
 
     stdlib.h
 int atoi(const char *str);
+int isalpha(char c);                                                DONE
+int isdigit(char c);                                                DONE
 
     stdio.h
 int vsprintf(char *str, const char *format, va_list arg);           DONE

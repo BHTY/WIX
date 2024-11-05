@@ -44,11 +44,11 @@ task_switch:
 
 extern jump_usermode
 
-global thread_fun_1
+;global thread_fun_1
 thread_fun_1:
-    push 0
-    push thread_fun_1_3
-    call jump_usermode
+    ;push 0
+    ;push thread_fun_1_3
+    ;call jump_usermode
 
     mov ecx, 0x10101010
     mov al, 'P'
@@ -60,7 +60,7 @@ thread_fun_1:
 thread_fun_1_3:
     jmp $
 
-global thread_fun_2
+;global thread_fun_2
 thread_fun_2:
     inc byte [0xb8004]
     jmp thread_fun_2

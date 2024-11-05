@@ -5,10 +5,18 @@
 [org 0x7c00]
 [bits 16]
 
-mov ax, cs
+jmp 0:go
+
+go:
+
+;mov ax, cs
+;mov ds, ax
+;mov ss, ax
+;xor ax, ax
+xor ax, ax
 mov ds, ax
 mov ss, ax
-xor ax, ax
+mov sp, 0x7c00
 
 ; read drive geometry
 mov [disk_num], dl
