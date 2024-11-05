@@ -37,7 +37,7 @@ void install_tss(gdt_entry_t *g) {
 	// Ensure the TSS is initially zero'd.
 	memset(&tss_entry, 0, sizeof tss_entry);
 
-	tss_entry.ss0  = 0x08;  // Set the kernel stack segment.
+	tss_entry.ss0  = 0x10;  // Set the kernel stack segment.
 	tss_entry.esp0 = 0x7C00; // Set the kernel stack pointer.
 	//note that CS is loaded from the IDT entry and should be the regular kernel code segment
 }

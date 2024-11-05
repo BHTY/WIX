@@ -17,8 +17,9 @@ isr_stub_%+%1:
 	iret
 %endmacro
 
-isr_stub_128:
-    jmp $
+;isr_stub_128:
+;    mov byte [0xb8000], 'F'
+;    jmp $
 
 global test_int
 test_int:
@@ -156,7 +157,7 @@ isr_no_err_stub 124
 isr_no_err_stub 125
 isr_no_err_stub 126
 isr_no_err_stub 127
-;isr_no_err_stub 128
+isr_no_err_stub 128
 isr_no_err_stub 129
 isr_no_err_stub 130
 isr_no_err_stub 131

@@ -2,7 +2,7 @@ global jump_usermode
 jump_usermode:
     ;int 0x80
 
-    cli
+    ;cli
 	mov ax, (4 * 8) | 3 ; ring 3 data with bottom 2 bits set for ring 3
 	mov ds, ax
 	mov es, ax 
@@ -22,5 +22,5 @@ jump_usermode:
 
 test_user_function:
     inc byte [0xb8000]
-    int 0x80
-    jmp $
+    ;int 0x80
+    jmp test_user_function
