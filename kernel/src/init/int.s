@@ -2,18 +2,22 @@
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
+    cli
     push %1
 	call exception_handler
 	add esp, 8
+    sti
 	iret
 %endmacro
 
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
+    pushfd
     pusha
 	push %1
 	call interrupt_handler
-	add esp, 36
+	add esp, 40
+    ;jmp $
 	iret
 %endmacro
 

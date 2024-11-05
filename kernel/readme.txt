@@ -1,12 +1,21 @@
 Todo List
-1.) Fix... so many bugs
+1.) Fix... so many bugs (kheap)
 2.) Thread cleanup
-3.) User mode
-4.) Sleep queues / blocking / synch objects
+3.) Sleep queues / blocking / synch objects
     Mutex
     Critical Section
-5.) Slab allocator
-6.) Multiple address spaces
+4.) Slab allocator (for threads and stuff)
+5.) Multiple address spaces
+
+Fixing user mode
+- Syscalls
+- Swapping kernel stacks
+
+Loading additional processes
+
+Superior timeslice scheduler
+
+TTY/bootvid (ANSI?)
 
 MEMORY MANAGEMENT
 Applications dynamically allocate memory by requesting it from the system via the sbrk(int) system call, which raises the program break, extending the heap, and returning the new program break.

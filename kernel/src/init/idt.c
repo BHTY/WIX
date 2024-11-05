@@ -38,6 +38,14 @@ __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state
 /* Base exception handler */
 __attribute__((noreturn)) uint32_t exception_handler(int code, uint32_t error_code){
     dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
+    
+    if(code == 0x0E){
+        uint32_t vaddr;
+        __asm__ volatile("movl %cr2, %eax");
+        __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
+        dbg_printf("Page fault accessing %x\n", vaddr);
+    }
+
     while(1);
 }
 

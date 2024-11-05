@@ -18,7 +18,7 @@ typedef struct{
 } __attribute__((packed)) idtr_t;
 
 typedef struct _int_state{
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax, eflags;
 } int_state_t;
 
 extern void* isr_stub_table[];

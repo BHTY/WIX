@@ -23,6 +23,7 @@ typedef struct task{
     uint32_t esp;
     struct task* next;
     struct task* prev;
+    uint32_t esp0;
 } task_t;
 
 typedef (*thread_func_t)(void*);
@@ -31,16 +32,23 @@ task_t* cur_task;
 task_t base_task;
 
 extern void (*dbg_printf)(const char*, ...);
-void task_switch();
+void task_switch(int_state_t* state);
 
 void test_int();
 
+void dump_regs(int_state_t* state){
+    dbg_printf("\nEAX: %x ECX: %x EBX: %x EDX: %x\nEBP: %x ESP: %x ESI: %x EDI: %x\n", state->eax, state->ecx, state->ebx, state->edx, state->ebp, state->esp, state->esi, state->edi);
+}
+
+// override in asm!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!
 uint32_t pit_isr(int_state_t* state){
-    //dbg_printf("Hello! ESP=%x [%x]\n", state->esp, *(uint32_t*)state->esp);
-    dbg_printf("\nContext switch\n");
+    // push regs
+    //dbg_printf("\nContext switch: ");
+    //dump_regs(state);
     pic_send_eoi(0);
-    task_switch();
-    return 0;
+    //dbg_printf("EOI sent\n");
+    task_switch(state);
+    //return 0x30;
 }
 
 uint32_t syscall_handler(int_state_t* state){
@@ -59,7 +67,7 @@ void thread_exit(){
     while(1);
 }
 
-void thread_fun_1(void* param){
+/*void thread_fun_1(void* param){
     while (1){
         //dbg_printf("A");
         //task_switch();
@@ -70,7 +78,10 @@ void thread_fun_2(void* param){
     while (1){
         //dbg_printf("B");
     }
-}
+}*/
+
+void thread_fun_1(void* param);
+void thread_fun_2(void* param);
 
 void create_thread(task_t* task, thread_func_t fn, void* param){
     uint32_t* stack = heap_alloc(4096) + 4096;
@@ -79,6 +90,9 @@ void create_thread(task_t* task, thread_func_t fn, void* param){
     stack--; *stack = thread_exit;
     stack--; *stack = fn;
     stack--; *stack = 0x202; //eflags
+    stack--; *stack = 0;
+    stack--; *stack = 0;
+    stack--; *stack = 0;
     stack--; *stack = 0;
     stack--; *stack = 0;
     stack--; *stack = 0;
@@ -106,7 +120,8 @@ task_t* spawn_thread(thread_func_t fn, void* param){
     return cur_task->next;
 }
  
-void jump_usermode();
+void jump_usermode(uint32_t, uint32_t);
+void test_user_function();
 
 void _start(kernel_startup_params_t* params){
     char buf[40];
@@ -135,9 +150,9 @@ void _start(kernel_startup_params_t* params){
     spawn_thread(thread_fun_1, 0);
     spawn_thread(thread_fun_2, 0);
 
-    dbg_printf("Okay...\n");
+    //dbg_printf("Okay...\n");
 
-    jump_usermode();
+    jump_usermode(test_user_function, 0xF00F);
 
     while(1){
         
@@ -159,6 +174,6 @@ void _start(kernel_startup_params_t* params){
     //sbrk(0x100);
 
     while(1){
-        (*(unsigned char*)(0x200000))++;
+        //(*(unsigned char*)(0x200000))++;
     }
 }

@@ -1,6 +1,9 @@
 global jump_usermode
+global test_user_function
 jump_usermode:
     ;int 0x80
+    mov ebx, [esp+0x8] ;argument
+    mov ecx, [esp+0x4] ;address to jump to
 
     ;cli
 	mov ax, (4 * 8) | 3 ; ring 3 data with bottom 2 bits set for ring 3
@@ -13,11 +16,12 @@ jump_usermode:
 
 	; set up the stack frame iret expects
 	mov eax, esp
+    push ebx
 	push (4 * 8) | 3 ; data selector
 	push eax ; current esp
 	pushf ; eflags
 	push (3 * 8) | 3 ; code selector (ring 3 code with bottom 2 bits set for ring 3)
-	push test_user_function ; instruction address to return to
+	push ecx ; instruction address to return to
 	iret
 
 test_user_function:
