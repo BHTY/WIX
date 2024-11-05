@@ -7,6 +7,8 @@ Todo List
 4.) Slab allocator (for threads and stuff)
 5.) Multiple address spaces
 
+Kernel debugger
+
 Fixing user mode
 - Syscalls
 - Swapping kernel stacks
