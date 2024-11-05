@@ -3,6 +3,7 @@ struc TASK
   .next:       resd    1 
   .prev:       resd    1 
   .esp0:       resd    1
+  .cr3:        resd    1
 endstruc
 
 extern cur_task

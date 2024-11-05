@@ -11,6 +11,7 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <stdio.h>
+#include <assert.h>
 
 int interrupt_tick = 0;
 
@@ -189,16 +190,14 @@ void _start(kernel_startup_params_t* params){
 
     tty_write(str1, strlen(str1));
 
+    assert(0!=0);
+
     while(1){
-        sprintf(buf, "\x0DTime: %d", interrupt_tick);
+        //sprintf(buf, "\x0DTime: %d", interrupt_tick);
+        sprintf(buf, "\x0D%s line %d", __FILE__, __LINE__);
         tty_write(buf, strlen(buf));
         //tty_write("I'm a happy kernel mode task!\n", strlen("I'm a happy kernel mode task!\n"));
         //print("I'm a happy kernel mode task!\n");
-    }
-
-    while(1){
-        sprintf(buf, "Hello %d\n", n++);
-        tty_write(buf, strlen(buf));
     }
 
     params->printf("Welcome to the WIX kernel!\nBuilt %s %s\n", __DATE__, __TIME__);

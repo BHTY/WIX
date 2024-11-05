@@ -37,20 +37,22 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
     sprintf(buf, "FAULTING ADDRESS: %x:%x\n", cs, eip);
     tty_write(buf, strlen(buf));
 
-    if (code == 0x0E){
-        uint32_t vaddr;
-        __asm__ volatile("movl %cr2, %eax");
-        __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
+    switch(code){
+        case 0x0E:{
+            uint32_t vaddr;
+            __asm__ volatile("movl %cr2, %eax");
+            __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
 
-        sprintf(buf, "PAGE FAULT ACCESSING 0x%x\n", vaddr);
-        tty_write(buf, strlen(buf));
-
-        //dbg_printf("Page fault accessing %x\n", vaddr);
-    }
-
-    if (code == 0x20){
-        sprintf(buf, "UNHANDLED INTERRUPT 0x%x\n", error_code);
-        tty_write(buf, strlen(buf));
+            sprintf(buf, "PAGE FAULT ACCESSING 0x%x\n", vaddr);
+            tty_write(buf, strlen(buf));
+            break;
+        }
+        case 0x20:{
+            sprintf(buf, "UNHANDLED INTERRUPT 0x%x\n", error_code);
+            tty_write(buf, strlen(buf));
+            break;
+        }
+        default: break;
     }
 
     tty_write("\n", 1);
