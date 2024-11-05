@@ -45,8 +45,6 @@ GDT_Start:
 		db 0x92
 		db 0xcf
 		db 0
-    user_code_descriptor:
-    user_data_descriptor:
 	GDT_End:
 
 GDT_Descriptor:
@@ -111,6 +109,7 @@ start_protected_mode:
 
     call fill_pt
 
+    ; enable paging
     mov eax, 0x30000
     mov cr3, eax
     mov eax, cr0

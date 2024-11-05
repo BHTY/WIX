@@ -55,7 +55,7 @@ void idt_init() {
     idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
  
     for (uint8_t vector = 0; vector < 255; vector++) {
-        idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
+        idt_set_descriptor(vector, isr_stub_table[vector], 0xEE); //0x8E
         //vectors[vector] = 1;
     }
  

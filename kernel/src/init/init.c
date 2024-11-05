@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <init/idt.h>
 #include <init/pic.h>
+#include <init/gdt.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <stdio.h>
@@ -99,6 +100,7 @@ task_t* spawn_thread(thread_func_t fn, void* param){
     return cur_task->next;
 }
  
+void jump_usermode();
 
 void _start(kernel_startup_params_t* params){
     char buf[40];
@@ -113,6 +115,8 @@ void _start(kernel_startup_params_t* params){
     idt_init();
     set_isr(0x70, pit_isr);
 
+    gdt_init();
+
     map_page(0x30000, 0xB8000, 0x200000);
 
     io_write_8(0x43, 52);
@@ -125,6 +129,8 @@ void _start(kernel_startup_params_t* params){
     spawn_thread(thread_fun_2, 0);
 
     dbg_printf("Okay...\n");
+
+    jump_usermode();
 
     while(1){
         

@@ -6,6 +6,7 @@ Todo List
     Mutex
     Critical Section
 5.) Slab allocator
+6.) Multiple address spaces
 
 MEMORY MANAGEMENT
 Applications dynamically allocate memory by requesting it from the system via the sbrk(int) system call, which raises the program break, extending the heap, and returning the new program break.
@@ -27,3 +28,5 @@ User Mode Memory Map
 |--------| 0x00001000
 | Unused |
 ---------- 0x00000000
+
+Task Control Block

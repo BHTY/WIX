@@ -17,6 +17,9 @@ isr_stub_%+%1:
 	iret
 %endmacro
 
+isr_stub_128:
+    jmp $
+
 global test_int
 test_int:
     mov eax, 0x10101010
@@ -153,7 +156,7 @@ isr_no_err_stub 124
 isr_no_err_stub 125
 isr_no_err_stub 126
 isr_no_err_stub 127
-isr_no_err_stub 128
+;isr_no_err_stub 128
 isr_no_err_stub 129
 isr_no_err_stub 130
 isr_no_err_stub 131
