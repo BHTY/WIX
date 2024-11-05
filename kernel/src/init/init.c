@@ -4,12 +4,17 @@
     init.c - Kernel initialization
 */
 
+#include <string.h>
 #include <stdint.h>
 #include <init/idt.h>
 #include <init/pic.h>
 #include <init/gdt.h>
+#include <init/io.h>
+#include <tty/tty.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
+#include <mm/heap.h>
+#include <mm/brk.h>
 #include <stdio.h>
 #include <assert.h>
 
@@ -30,7 +35,7 @@ typedef struct task{
     uint32_t cr3;
 } task_t;
 
-typedef (*thread_func_t)(void*);
+typedef uint32_t (*thread_func_t)(void*);
 
 task_t* cur_task;
 task_t base_task;
@@ -40,30 +45,23 @@ void task_switch(int_state_t* state);
 
 void test_int();
 
+void print(char* str){
+    dbg_printf(str);
+}
+
 void dump_regs(int_state_t* state){
     dbg_printf("\nEAX: %x ECX: %x EBX: %x EDX: %x\nEBP: %x ESP: %x ESI: %x EDI: %x\n", state->eax, state->ecx, state->ebx, state->edx, state->ebp, state->esp, state->esi, state->edi);
 }
 
-// override in asm!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!
 uint32_t pit_isr(int_state_t* state){
-    // push regs
-    //dbg_printf("\nContext switch: ");
-    //dump_regs(state);
     interrupt_tick++;
     pic_send_eoi(0);
-    //dbg_printf("EOI sent\n");
     task_switch(state);
-    //return 0x30;
 }
 
 uint32_t syscall_handler(int_state_t* state){
-    //dbg_printf("System call %x\n", state->eax);
+    if(state->eax == 0x01) print((char*)(state->ebx));
 
-    if(state->eax == 0x01){
-        print(state->ebx);
-    }
-
-    //while(1);
     return 0;
 }
 
@@ -79,28 +77,15 @@ void thread_exit(){
     while(1);
 }
 
-/*void thread_fun_1(void* param){
-    while (1){
-        dbg_printf("A");
-        //task_switch();
-    }
-}*/
-
-/*void thread_fun_2(void* param){
-    while (1){
-        dbg_printf("B");
-    }
-}*/
-
-void thread_fun_1(void* param);
-void thread_fun_2(void* param);
+uint32_t thread_fun_1(void* param);
+uint32_t thread_fun_2(void* param);
 
 void create_thread(task_t* task, thread_func_t fn, void* param, int user_esp){
     uint32_t* stack = heap_alloc(4096) + 4096;
 
-    stack--; *stack = param;
-    stack--; *stack = thread_exit;
-    stack--; *stack = fn;
+    stack--; *stack = (uint32_t)param;
+    stack--; *stack = (uint32_t)thread_exit;
+    stack--; *stack = (uint32_t)fn;
     stack--; *stack = 0x202; //eflags
     stack--; *stack = 0;
     stack--; *stack = 0;
@@ -110,10 +95,10 @@ void create_thread(task_t* task, thread_func_t fn, void* param, int user_esp){
     stack--; *stack = 0;
     stack--; *stack = 0;
 
-    task->esp = stack;
+    task->esp = (uint32_t)stack;
 
     if (user_esp){
-        task->esp0 = heap_alloc(4096) + 4096;
+        task->esp0 = (uint32_t)heap_alloc(4096) + 4096;
     }
 }
 
@@ -135,16 +120,6 @@ task_t* spawn_thread(thread_func_t fn, void* param, int user_esp){
 
     return cur_task->next;
 }
- 
-void jump_usermode(uint32_t, uint32_t);
-void test_user_function();
-
-void bootvid_fill(uint16_t start, uint16_t end);
-
-void print(char* str){
-    //tty_write(str, strlen(str));
-    dbg_printf(str);
-}
 
 void _start(kernel_startup_params_t* params){
     char buf[40];
@@ -163,59 +138,28 @@ void _start(kernel_startup_params_t* params){
     
     gdt_init();
 
-    unmap_page(0x30000, 0x0);
+    unmap_page((void*)0x30000, 0x0);
 
     io_write_8(0x43, 52);
-	//outp(0x40, 0x95);
-	//outp(0x40, 0x42);
 	io_write_8(0x40, 0xdf);
 	io_write_8(0x40, 0x4);
 
-    //dbg_printf("\x1B[41m\x1B[2J\x1B[HFATAL ERROR\n");
-
     tty_init();
-    //tty_write("\x1B[41m\x1B[2JHi\x1B[H", 14);
-    //bootvid_fill(0, 2000);
-
-    //*(uint8_t*)(0x300000) = 0;
 
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);
-
-    //dbg_printf("Okay...\n");
-
-    //jump_usermode(test_user_function, 0xF00F);
 
     char* str1 = "\x1B[33m[\x1B[H\x1B[JWelcome to WIX!\nPress any key to cause a crash.\n";
 
     tty_write(str1, strlen(str1));
 
-    assert(0!=0);
-
-    while(1){
-        //sprintf(buf, "\x0DTime: %d", interrupt_tick);
-        sprintf(buf, "\x0D%s line %d", __FILE__, __LINE__);
+    while(1){ // Happy kernel mode task!!!
+        sprintf(buf, "\x0DTime: %d", interrupt_tick);
         tty_write(buf, strlen(buf));
-        //tty_write("I'm a happy kernel mode task!\n", strlen("I'm a happy kernel mode task!\n"));
-        //print("I'm a happy kernel mode task!\n");
     }
 
     params->printf("Welcome to the WIX kernel!\nBuilt %s %s\n", __DATE__, __TIME__);
     sprintf(buf, "%d KB Extended Memory\n", params->mem_size);
     params->printf(buf);
 
-    //heap_init();
-    char* ptr1 = heap_alloc(1024);
-    char* ptr2 = heap_alloc(1024);
-    char* ptr3 = heap_alloc(1024);
-    //heap_free(ptr2);
-    char* ptr4 = heap_alloc(1024);
-    heap_free(ptr3);
-    heap_print();
-
-    //sbrk(0x100);
-
-    while(1){
-        //(*(unsigned char*)(0x200000))++;
-    }
 }

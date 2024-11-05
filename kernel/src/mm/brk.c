@@ -11,7 +11,7 @@ void* sbrk(size_t increment){
 
     while(new_brk > brk_end){
         paddr_t new_page = commit_page() << 12;
-        map_page(0x30000, new_page, brk_end);
+        map_page((void*)0x30000, new_page, brk_end);
 
         brk_end += 0x1000;
     }
@@ -20,5 +20,5 @@ void* sbrk(size_t increment){
 
     dbg_printf("Raised program break by %x bytes to %x\n", increment, brk);
 
-    return brk;
+    return (void*)brk;
 }

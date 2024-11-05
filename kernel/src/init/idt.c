@@ -9,6 +9,8 @@
 #include <init/idt.h>
 #include <init/io.h>
 #include <init/pic.h>
+#include <tty/tty.h>
+#include <stdio.h>
 
 __attribute__((aligned(0x10))) static idt_entry_t idt[256];
 
@@ -22,6 +24,18 @@ isr_func set_isr(int index, isr_func new_func){
     isr_func old_func = isr_table[index];
     isr_table[index] = new_func;
     return old_func;
+}
+
+void crash_dump(char* buf, int_state_t* state){
+    sprintf(buf, "EAX: 0x%x\nECX: 0x%x\nEDX: 0x%x\nEBX: 0x%x\nEBP: 0x%x\nESP: 0x%x\nESI: 0x%x\nEDI: 0x%x\n\n", state->eax, state->ecx, state->edx, state->ebx, state->ebp, state->esp, state->esi, state->edi);
+    tty_write(buf, strlen(buf));
+    
+    //stack dump
+
+    for(int i = 0; i < 32; i += 4){
+        sprintf(buf, "[ESP+0x%X] = 0x%x\n", i, *(uint32_t*)(state->esp + i));
+        tty_write(buf, strlen(buf));
+    }   
 }
 
 void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, uint32_t eip){
@@ -75,21 +89,6 @@ __attribute__((noreturn)) uint32_t interrupt_handler(int code, int_state_t state
         //while(1);
         bug_check(&state, 0x20, code, *(((uint32_t*)((&state + 1)))+1), *(uint32_t*)(&state + 1));
     }
-}
-
-void tty_write(const void* buf, size_t count);
-void sprintf(char* str, const char* format, ...);
-
-void crash_dump(char* buf, int_state_t* state){
-    sprintf(buf, "EAX: 0x%x\nECX: 0x%x\nEDX: 0x%x\nEBX: 0x%x\nEBP: 0x%x\nESP: 0x%x\nESI: 0x%x\nEDI: 0x%x\n\n", state->eax, state->ecx, state->edx, state->ebx, state->ebp, state->esp, state->esi, state->edi);
-    tty_write(buf, strlen(buf));
-    
-    //stack dump
-
-    for(int i = 0; i < 32; i += 4){
-        sprintf(buf, "[ESP+0x%X] = 0x%x\n", i, *(uint32_t*)(state->esp + i));
-        tty_write(buf, strlen(buf));
-    }   
 }
 
 __attribute__((noreturn)) uint32_t exception_handler(int code, int_state_t state, uint32_t error_code){

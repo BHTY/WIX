@@ -43,7 +43,7 @@ void heap_print(){
 void heap_init(){
     mem_block_t temp;
     heap_size = 0x100000;
-    heap_start = 0x100000;
+    heap_start = (void*)0x100000;
 	temp.used = 0;
 	temp.size = heap_size - sizeof(mem_block_t);
 	temp.prev = 0;

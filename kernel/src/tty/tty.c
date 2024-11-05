@@ -178,7 +178,7 @@ void proc_char(int ch){
 }
 
 void tty_write(const void* buf, size_t count){
-    char* str = buf;
+    const char* str = buf;
 
     while(count--){
         proc_char(*str++);

@@ -12,7 +12,7 @@ void map_page(pgdir_t* page_dir, paddr_t paddr, vaddr_t vaddr){
         page_dir->entries[pd_entry] = (commit_page() << 12) | 7;
     }
 
-    pgtable_t* page_table = page_dir->entries[pd_entry] & 0xFFFFF000;
+    pgtable_t* page_table = (pgtable_t*)(page_dir->entries[pd_entry] & 0xFFFFF000);
     page_table->entries[pt_entry] = paddr | 7;
 
     dbg_printf("[VMM] Mapped physical address %x to linear address %x\n", paddr, vaddr);
@@ -23,7 +23,7 @@ void unmap_page(pgdir_t* page_dir, vaddr_t vaddr){
     uintptr_t pt_entry = (vaddr >> 12) & 0x3FF; // index into page table
 
     if(page_dir->entries[pd_entry] != 0){
-        pgtable_t* page_table = page_dir->entries[pd_entry] & 0xFFFFF000;
+        pgtable_t* page_table = (pgtable_t*)(page_dir->entries[pd_entry] & 0xFFFFF000);
         page_table->entries[pt_entry] = 0x0;
         dbg_printf("[VMM] Unmapped linear address %x\n", vaddr);
     }

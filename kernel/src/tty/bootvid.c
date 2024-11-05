@@ -84,7 +84,7 @@ int bootvid_gotoxy(uint16_t x, uint16_t y){
 void bootvid_fill(uint16_t start, uint16_t end){
     uint16_t value = text_attr << 8;
     int i;
-    uint16_t* buf = text_buffer;
+    uint16_t* buf = (uint16_t*)text_buffer;
 
     for(i = start; i < end; i++){
         buf[i] = value;
