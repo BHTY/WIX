@@ -26,6 +26,7 @@ typedef struct task{
     struct task* next;
     struct task* prev;
     uint32_t esp0;
+    uint32_t cr3;
 } task_t;
 
 typedef (*thread_func_t)(void*);

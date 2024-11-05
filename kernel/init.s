@@ -19,9 +19,9 @@ cur_task:
 	.globl	base_task
 	.align 4
 	.type	base_task, @object
-	.size	base_task, 16
+	.size	base_task, 20
 base_task:
-	.zero	16
+	.zero	20
 	.section	.rodata
 	.align 4
 .LC0:
@@ -32,7 +32,7 @@ base_task:
 dump_regs:
 .LFB0:
 	.file 1 "src/init/init.c"
-	.loc 1 41 35
+	.loc 1 42 35
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -46,7 +46,7 @@ dump_regs:
 	.cfi_offset 7, -12
 	.cfi_offset 6, -16
 	.cfi_offset 3, -20
-	.loc 1 42 5
+	.loc 1 43 5
 	movl	dbg_printf, %edi
 	movl	8(%ebp), %eax
 	movl	(%eax), %ecx
@@ -80,7 +80,7 @@ dump_regs:
 	call	*%edi
 .LVL0:
 	addl	$48, %esp
-	.loc 1 43 1
+	.loc 1 44 1
 	nop
 	leal	-12(%ebp), %esp
 	popl	%ebx
@@ -100,7 +100,7 @@ dump_regs:
 	.type	pit_isr, @function
 pit_isr:
 .LFB1:
-	.loc 1 46 37
+	.loc 1 47 37
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -108,21 +108,21 @@ pit_isr:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$8, %esp
-	.loc 1 50 19
+	.loc 1 51 19
 	movl	interrupt_tick, %eax
 	incl	%eax
 	movl	%eax, interrupt_tick
-	.loc 1 51 5
+	.loc 1 52 5
 	subl	$12, %esp
 	pushl	$0
 	call	pic_send_eoi
 	addl	$16, %esp
-	.loc 1 53 5
+	.loc 1 54 5
 	subl	$12, %esp
 	pushl	8(%ebp)
 	call	task_switch
 	addl	$16, %esp
-	.loc 1 55 1
+	.loc 1 56 1
 	nop
 	leave
 	.cfi_restore 5
@@ -135,7 +135,7 @@ pit_isr:
 	.type	syscall_handler, @function
 syscall_handler:
 .LFB2:
-	.loc 1 57 45
+	.loc 1 58 45
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -143,14 +143,14 @@ syscall_handler:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$8, %esp
-	.loc 1 60 13
+	.loc 1 61 13
 	movl	8(%ebp), %eax
 	movl	28(%eax), %eax
-	.loc 1 60 7
+	.loc 1 61 7
 	cmpl	$1, %eax
 	jne	.L4
 .LBB2:
-	.loc 1 61 9
+	.loc 1 62 9
 	movl	8(%ebp), %eax
 	movl	16(%eax), %eax
 	subl	$12, %esp
@@ -159,9 +159,9 @@ syscall_handler:
 	addl	$16, %esp
 .L4:
 .LBE2:
-	.loc 1 65 12
+	.loc 1 66 12
 	movl	$0, %eax
-	.loc 1 66 1
+	.loc 1 67 1
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4
@@ -173,21 +173,21 @@ syscall_handler:
 	.type	init_tasking, @function
 init_tasking:
 .LFB3:
-	.loc 1 68 20
+	.loc 1 69 20
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
 	.cfi_offset 5, -8
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
-	.loc 1 69 14
+	.loc 1 70 14
 	movl	$base_task, cur_task
-	.loc 1 70 20
+	.loc 1 71 20
 	movl	cur_task, %eax
 	movl	%eax, base_task+4
-	.loc 1 71 20
+	.loc 1 72 20
 	movl	$-559038737, base_task+12
-	.loc 1 72 1
+	.loc 1 73 1
 	nop
 	popl	%ebp
 	.cfi_restore 5
@@ -204,7 +204,7 @@ init_tasking:
 	.type	thread_exit, @function
 thread_exit:
 .LFB4:
-	.loc 1 74 19
+	.loc 1 75 19
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -212,9 +212,9 @@ thread_exit:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$8, %esp
-	.loc 1 75 5
-	call	disable_interrupts
 	.loc 1 76 5
+	call	disable_interrupts
+	.loc 1 77 5
 	movl	dbg_printf, %eax
 	subl	$12, %esp
 	pushl	$.LC1
@@ -222,7 +222,7 @@ thread_exit:
 .LVL1:
 	addl	$16, %esp
 .L8:
-	.loc 1 77 10 discriminator 1
+	.loc 1 78 10 discriminator 1
 	jmp	.L8
 	.cfi_endproc
 .LFE4:
@@ -231,7 +231,7 @@ thread_exit:
 	.type	create_thread, @function
 create_thread:
 .LFB5:
-	.loc 1 96 78
+	.loc 1 97 78
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -239,43 +239,38 @@ create_thread:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$24, %esp
-	.loc 1 97 23
+	.loc 1 98 23
 	subl	$12, %esp
 	pushl	$4096
 	call	heap_alloc
 	addl	$16, %esp
-	.loc 1 97 40
+	.loc 1 98 40
 	addl	$4096, %eax
-	.loc 1 97 15
+	.loc 1 98 15
 	movl	%eax, -12(%ebp)
-	.loc 1 99 10
-	subl	$4, -12(%ebp)
-	.loc 1 99 21
-	movl	16(%ebp), %edx
-	movl	-12(%ebp), %eax
-	movl	%edx, (%eax)
 	.loc 1 100 10
 	subl	$4, -12(%ebp)
 	.loc 1 100 21
-	movl	$thread_exit, %edx
+	movl	16(%ebp), %edx
 	movl	-12(%ebp), %eax
 	movl	%edx, (%eax)
 	.loc 1 101 10
 	subl	$4, -12(%ebp)
 	.loc 1 101 21
-	movl	12(%ebp), %edx
+	movl	$thread_exit, %edx
 	movl	-12(%ebp), %eax
 	movl	%edx, (%eax)
 	.loc 1 102 10
 	subl	$4, -12(%ebp)
 	.loc 1 102 21
+	movl	12(%ebp), %edx
 	movl	-12(%ebp), %eax
-	movl	$514, (%eax)
+	movl	%edx, (%eax)
 	.loc 1 103 10
 	subl	$4, -12(%ebp)
 	.loc 1 103 21
 	movl	-12(%ebp), %eax
-	movl	$0, (%eax)
+	movl	$514, (%eax)
 	.loc 1 104 10
 	subl	$4, -12(%ebp)
 	.loc 1 104 21
@@ -306,26 +301,31 @@ create_thread:
 	.loc 1 109 21
 	movl	-12(%ebp), %eax
 	movl	$0, (%eax)
-	.loc 1 111 15
+	.loc 1 110 10
+	subl	$4, -12(%ebp)
+	.loc 1 110 21
+	movl	-12(%ebp), %eax
+	movl	$0, (%eax)
+	.loc 1 112 15
 	movl	-12(%ebp), %edx
 	movl	8(%ebp), %eax
 	movl	%edx, (%eax)
-	.loc 1 113 8
+	.loc 1 114 8
 	cmpl	$0, 20(%ebp)
 	je	.L11
-	.loc 1 114 22
+	.loc 1 115 22
 	subl	$12, %esp
 	pushl	$4096
 	call	heap_alloc
 	addl	$16, %esp
-	.loc 1 114 39
+	.loc 1 115 39
 	addl	$4096, %eax
 	movl	%eax, %edx
-	.loc 1 114 20
+	.loc 1 115 20
 	movl	8(%ebp), %eax
 	movl	%edx, 12(%eax)
 .L11:
-	.loc 1 116 1
+	.loc 1 117 1
 	nop
 	leave
 	.cfi_restore 5
@@ -342,7 +342,7 @@ create_thread:
 	.type	spawn_thread, @function
 spawn_thread:
 .LFB6:
-	.loc 1 118 66
+	.loc 1 119 66
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -350,76 +350,76 @@ spawn_thread:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$24, %esp
-	.loc 1 119 5
+	.loc 1 120 5
 	call	disable_interrupts
-	.loc 1 120 28
+	.loc 1 121 28
 	movl	cur_task, %eax
-	.loc 1 120 13
+	.loc 1 121 13
 	movl	4(%eax), %eax
 	movl	%eax, -12(%ebp)
-	.loc 1 121 22
+	.loc 1 122 22
 	subl	$12, %esp
-	pushl	$16
+	pushl	$20
 	call	heap_alloc
 	addl	$16, %esp
 	movl	%eax, %edx
-	.loc 1 121 13
-	movl	cur_task, %eax
-	.loc 1 121 20
-	movl	%edx, 4(%eax)
 	.loc 1 122 13
 	movl	cur_task, %eax
-	movl	4(%eax), %eax
-	.loc 1 122 26
-	movl	cur_task, %edx
-	movl	%edx, 8(%eax)
+	.loc 1 122 20
+	movl	%edx, 4(%eax)
 	.loc 1 123 13
 	movl	cur_task, %eax
 	movl	4(%eax), %eax
 	.loc 1 123 26
+	movl	cur_task, %edx
+	movl	%edx, 8(%eax)
+	.loc 1 124 13
+	movl	cur_task, %eax
+	movl	4(%eax), %eax
+	.loc 1 124 26
 	movl	-12(%ebp), %edx
 	movl	%edx, 4(%eax)
-	.loc 1 124 26
+	.loc 1 125 26
 	movl	cur_task, %eax
 	movl	4(%eax), %edx
-	.loc 1 124 16
+	.loc 1 125 16
 	movl	-12(%ebp), %eax
 	movl	%edx, 8(%eax)
-	.loc 1 126 17
+	.loc 1 127 17
 	movl	cur_task, %eax
 	movl	8(%eax), %eax
-	.loc 1 126 7
+	.loc 1 127 7
 	testl	%eax, %eax
 	jne	.L13
-	.loc 1 126 33 discriminator 1
+	.loc 1 127 33 discriminator 1
 	movl	cur_task, %eax
-	.loc 1 126 40 discriminator 1
+	.loc 1 127 40 discriminator 1
 	movl	-12(%ebp), %edx
 	movl	%edx, 8(%eax)
 .L13:
-	.loc 1 128 27
+	.loc 1 129 27
 	movl	cur_task, %eax
 	movl	4(%eax), %eax
-	.loc 1 128 5
+	.loc 1 129 5
 	pushl	16(%ebp)
 	pushl	12(%ebp)
 	pushl	8(%ebp)
 	pushl	%eax
 	call	create_thread
 	addl	$16, %esp
-	.loc 1 130 5
+	.loc 1 131 5
 	movl	dbg_printf, %eax
 	subl	$12, %esp
 	pushl	$.LC2
 	call	*%eax
 .LVL2:
 	addl	$16, %esp
-	.loc 1 132 5
+	.loc 1 133 5
 	call	enable_interrupts
-	.loc 1 134 20
+	.loc 1 135 20
 	movl	cur_task, %eax
 	movl	4(%eax), %eax
-	.loc 1 135 1
+	.loc 1 136 1
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4
@@ -431,7 +431,7 @@ spawn_thread:
 	.type	print, @function
 print:
 .LFB7:
-	.loc 1 142 22
+	.loc 1 143 22
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -439,14 +439,14 @@ print:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$8, %esp
-	.loc 1 144 5
+	.loc 1 145 5
 	movl	dbg_printf, %eax
 	subl	$12, %esp
 	pushl	8(%ebp)
 	call	*%eax
 .LVL3:
 	addl	$16, %esp
-	.loc 1 145 1
+	.loc 1 146 1
 	nop
 	leave
 	.cfi_restore 5
@@ -466,7 +466,7 @@ print:
 	.type	_start, @function
 _start:
 .LFB8:
-	.loc 1 147 45
+	.loc 1 148 45
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -474,89 +474,89 @@ _start:
 	movl	%esp, %ebp
 	.cfi_def_cfa_register 5
 	subl	$56, %esp
-	.loc 1 149 9
+	.loc 1 150 9
 	movl	$0, -12(%ebp)
-	.loc 1 150 5
+	.loc 1 151 5
 	call	pmm_init
-	.loc 1 152 24
+	.loc 1 153 24
 	movl	8(%ebp), %eax
 	movl	8(%eax), %eax
-	.loc 1 152 16
+	.loc 1 153 16
 	movl	%eax, dbg_printf
-	.loc 1 154 5
+	.loc 1 155 5
 	subl	$12, %esp
 	pushl	$1048576
 	call	sbrk
 	addl	$16, %esp
-	.loc 1 155 5
-	call	heap_init
 	.loc 1 156 5
-	call	init_tasking
+	call	heap_init
 	.loc 1 157 5
+	call	init_tasking
+	.loc 1 158 5
 	subl	$8, %esp
 	pushl	$120
 	pushl	$112
 	call	pic_remap
 	addl	$16, %esp
-	.loc 1 158 5
-	call	idt_init
 	.loc 1 159 5
+	call	idt_init
+	.loc 1 160 5
 	subl	$8, %esp
 	pushl	$pit_isr
 	pushl	$112
 	call	set_isr
 	addl	$16, %esp
-	.loc 1 160 5
+	.loc 1 161 5
 	subl	$8, %esp
 	pushl	$syscall_handler
 	pushl	$128
 	call	set_isr
 	addl	$16, %esp
-	.loc 1 162 5
+	.loc 1 163 5
 	call	gdt_init
-	.loc 1 164 5
+	.loc 1 165 5
 	subl	$8, %esp
 	pushl	$0
 	pushl	$196608
 	call	unmap_page
 	addl	$16, %esp
-	.loc 1 166 5
+	.loc 1 167 5
 	subl	$8, %esp
 	pushl	$52
 	pushl	$67
 	call	io_write_8
 	addl	$16, %esp
-	.loc 1 169 2
+	.loc 1 170 2
 	subl	$8, %esp
 	pushl	$223
 	pushl	$64
 	call	io_write_8
 	addl	$16, %esp
-	.loc 1 170 2
+	.loc 1 171 2
 	subl	$8, %esp
 	pushl	$4
 	pushl	$64
 	call	io_write_8
 	addl	$16, %esp
-	.loc 1 174 5
+	.loc 1 175 5
 	call	tty_init
-	.loc 1 180 5
+	.loc 1 181 5
 	subl	$4, %esp
 	pushl	$1
 	pushl	$0
 	pushl	$thread_fun_1
 	call	spawn_thread
 	addl	$16, %esp
-	.loc 1 181 5
+	.loc 1 182 5
 	subl	$4, %esp
 	pushl	$1
 	pushl	$0
 	pushl	$thread_fun_2
 	call	spawn_thread
 	addl	$16, %esp
-	.loc 1 187 11
+	.loc 1 188 11
 	movl	$.LC3, -16(%ebp)
-	.loc 1 189 5
+	.loc 1 190 5
 	subl	$12, %esp
 	pushl	-16(%ebp)
 	call	strlen
@@ -567,7 +567,7 @@ _start:
 	call	tty_write
 	addl	$16, %esp
 .L17:
-	.loc 1 192 9 discriminator 1
+	.loc 1 193 9 discriminator 1
 	movl	interrupt_tick, %eax
 	subl	$4, %esp
 	pushl	%eax
@@ -576,7 +576,7 @@ _start:
 	pushl	%eax
 	call	sprintf
 	addl	$16, %esp
-	.loc 1 193 9 discriminator 1
+	.loc 1 194 9 discriminator 1
 	subl	$12, %esp
 	leal	-56(%ebp), %eax
 	pushl	%eax
@@ -588,7 +588,7 @@ _start:
 	pushl	%eax
 	call	tty_write
 	addl	$16, %esp
-	.loc 1 192 9 discriminator 1
+	.loc 1 193 9 discriminator 1
 	jmp	.L17
 	.cfi_endproc
 .LFE8:
@@ -603,7 +603,7 @@ _start:
 	.file 8 "include/mm/pmm.h"
 	.section	.debug_info,"",@progbits
 .Ldebug_info0:
-	.long	0x6ec
+	.long	0x6f9
 	.value	0x5
 	.byte	0x1
 	.byte	0x4
@@ -889,10 +889,10 @@ _start:
 	.long	0x1cd
 	.uleb128 0xe
 	.long	.LASF33
-	.byte	0x10
+	.byte	0x14
 	.byte	0x1
 	.byte	0x18
-	.long	0x271
+	.long	0x27e
 	.uleb128 0x7
 	.string	"esp"
 	.byte	0x1
@@ -905,14 +905,14 @@ _start:
 	.byte	0x1
 	.byte	0x1a
 	.byte	0x12
-	.long	0x271
+	.long	0x27e
 	.byte	0x4
 	.uleb128 0x8
 	.long	.LASF35
 	.byte	0x1
 	.byte	0x1b
 	.byte	0x12
-	.long	0x271
+	.long	0x27e
 	.byte	0x8
 	.uleb128 0x8
 	.long	.LASF36
@@ -921,51 +921,58 @@ _start:
 	.byte	0xe
 	.long	0x68
 	.byte	0xc
+	.uleb128 0x7
+	.string	"cr3"
+	.byte	0x1
+	.byte	0x1d
+	.byte	0xe
+	.long	0x68
+	.byte	0x10
 	.byte	0
 	.uleb128 0x6
 	.long	0x230
 	.uleb128 0x5
 	.long	.LASF37
 	.byte	0x1
-	.byte	0x1d
+	.byte	0x1e
 	.byte	0x3
 	.long	0x230
 	.uleb128 0x5
 	.long	.LASF38
 	.byte	0x1
-	.byte	0x1f
+	.byte	0x20
 	.byte	0xb
-	.long	0x28e
+	.long	0x29b
 	.uleb128 0x6
-	.long	0x293
+	.long	0x2a0
 	.uleb128 0x14
 	.long	0x82
-	.long	0x2a2
+	.long	0x2af
 	.uleb128 0x2
 	.long	0x12a
 	.byte	0
 	.uleb128 0xf
 	.long	.LASF40
-	.byte	0x21
+	.byte	0x22
 	.byte	0x9
-	.long	0x2b3
+	.long	0x2c0
 	.uleb128 0x5
 	.byte	0x3
 	.long	cur_task
 	.uleb128 0x6
-	.long	0x276
+	.long	0x283
 	.uleb128 0xf
 	.long	.LASF41
-	.byte	0x22
+	.byte	0x23
 	.byte	0x8
-	.long	0x276
+	.long	0x283
 	.uleb128 0x5
 	.byte	0x3
 	.long	base_task
 	.uleb128 0x1f
 	.long	.LASF42
 	.byte	0x1
-	.byte	0x24
+	.byte	0x25
 	.byte	0xf
 	.long	0x21f
 	.uleb128 0x16
@@ -974,9 +981,9 @@ _start:
 	.byte	0x6
 	.byte	0x5
 	.long	0x82
-	.long	0x2f1
+	.long	0x2fe
 	.uleb128 0x2
-	.long	0x2f1
+	.long	0x2fe
 	.uleb128 0x2
 	.long	0x21a
 	.uleb128 0x1
@@ -985,59 +992,59 @@ _start:
 	.long	0x1b0
 	.uleb128 0x3
 	.long	.LASF43
-	.byte	0xbd
+	.byte	0xbe
 	.byte	0x5
 	.long	0x82
-	.long	0x307
+	.long	0x314
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF44
-	.byte	0xbd
+	.byte	0xbe
 	.byte	0x15
 	.long	0x82
-	.long	0x318
+	.long	0x325
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xa
 	.long	.LASF45
 	.byte	0x1
-	.byte	0x5e
-	.long	0x329
+	.byte	0x5f
+	.long	0x336
 	.uleb128 0x2
 	.long	0x12a
 	.byte	0
 	.uleb128 0xa
 	.long	.LASF46
 	.byte	0x1
-	.byte	0x5d
-	.long	0x33a
+	.byte	0x5e
+	.long	0x347
 	.uleb128 0x2
 	.long	0x12a
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF47
-	.byte	0xae
+	.byte	0xaf
 	.byte	0x5
 	.long	0x82
-	.long	0x34b
+	.long	0x358
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF48
-	.byte	0xa6
+	.byte	0xa7
 	.byte	0x5
 	.long	0x82
-	.long	0x35c
+	.long	0x369
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xa
 	.long	.LASF49
 	.byte	0x4
 	.byte	0x12
-	.long	0x372
+	.long	0x37f
 	.uleb128 0x2
-	.long	0x372
+	.long	0x37f
 	.uleb128 0x2
 	.long	0x16b
 	.byte	0
@@ -1047,7 +1054,7 @@ _start:
 	.long	.LASF55
 	.byte	0x7
 	.byte	0x3a
-	.long	0x384
+	.long	0x391
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x16
@@ -1056,7 +1063,7 @@ _start:
 	.byte	0x1c
 	.byte	0xa
 	.long	0x12c
-	.long	0x39f
+	.long	0x3ac
 	.uleb128 0x2
 	.long	0x82
 	.uleb128 0x2
@@ -1071,7 +1078,7 @@ _start:
 	.long	.LASF52
 	.byte	0x6
 	.byte	0x1a
-	.long	0x3bd
+	.long	0x3ca
 	.uleb128 0x2
 	.long	0x42
 	.uleb128 0x2
@@ -1079,54 +1086,54 @@ _start:
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF53
-	.byte	0x9b
+	.byte	0x9c
 	.byte	0x5
 	.long	0x82
-	.long	0x3ce
+	.long	0x3db
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF54
-	.byte	0x9a
+	.byte	0x9b
 	.byte	0x5
 	.long	0x82
-	.long	0x3df
+	.long	0x3ec
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xb
 	.long	.LASF56
 	.byte	0x8
 	.byte	0x8
-	.long	0x3ec
+	.long	0x3f9
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xb
 	.long	.LASF57
 	.byte	0x3
 	.byte	0x22
-	.long	0x3f9
+	.long	0x406
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF58
-	.byte	0x61
+	.byte	0x62
 	.byte	0x17
 	.long	0x82
-	.long	0x40a
+	.long	0x417
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xb
 	.long	.LASF59
 	.byte	0x3
 	.byte	0x23
-	.long	0x417
+	.long	0x424
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xa
 	.long	.LASF60
 	.byte	0x1
-	.byte	0x25
-	.long	0x428
+	.byte	0x26
+	.long	0x435
 	.uleb128 0x2
 	.long	0x14c
 	.byte	0
@@ -1134,37 +1141,37 @@ _start:
 	.long	.LASF61
 	.byte	0x6
 	.byte	0x19
-	.long	0x439
+	.long	0x446
 	.uleb128 0x2
 	.long	0x42
 	.byte	0
 	.uleb128 0x10
 	.long	.LASF69
-	.byte	0x93
+	.byte	0x94
 	.long	.LFB8
 	.long	.LFE8-.LFB8
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x541
+	.long	0x54e
 	.uleb128 0x9
 	.long	.LASF71
-	.byte	0x93
+	.byte	0x94
 	.byte	0x26
-	.long	0x541
+	.long	0x54e
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 0
 	.uleb128 0x17
 	.string	"buf"
-	.byte	0x94
+	.byte	0x95
 	.byte	0xa
-	.long	0x546
+	.long	0x553
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 -64
 	.uleb128 0x17
 	.string	"n"
-	.byte	0x95
+	.byte	0x96
 	.byte	0x9
 	.long	0x82
 	.uleb128 0x2
@@ -1172,95 +1179,95 @@ _start:
 	.sleb128 -20
 	.uleb128 0x3
 	.long	.LASF54
-	.byte	0x9a
+	.byte	0x9b
 	.byte	0x5
 	.long	0x82
-	.long	0x486
+	.long	0x493
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF53
-	.byte	0x9b
+	.byte	0x9c
 	.byte	0x5
 	.long	0x82
-	.long	0x497
+	.long	0x4a4
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF48
-	.byte	0xa6
+	.byte	0xa7
 	.byte	0x5
 	.long	0x82
-	.long	0x4a8
+	.long	0x4b5
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF47
-	.byte	0xae
+	.byte	0xaf
 	.byte	0x5
 	.long	0x82
-	.long	0x4b9
+	.long	0x4c6
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x11
 	.long	.LASF62
-	.byte	0xbb
+	.byte	0xbc
 	.byte	0xb
-	.long	0x2f1
+	.long	0x2fe
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 -24
 	.uleb128 0x3
 	.long	.LASF43
-	.byte	0xbd
+	.byte	0xbe
 	.byte	0x5
 	.long	0x82
-	.long	0x4d8
+	.long	0x4e5
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0x3
 	.long	.LASF44
-	.byte	0xbd
+	.byte	0xbe
 	.byte	0x15
 	.long	0x82
-	.long	0x4e9
+	.long	0x4f6
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xc
 	.long	.LASF63
-	.byte	0xd0
-	.long	0x2f1
+	.byte	0xd1
+	.long	0x2fe
 	.uleb128 0x3
 	.long	.LASF58
-	.byte	0x61
+	.byte	0x62
 	.byte	0x17
 	.long	0x82
-	.long	0x504
+	.long	0x511
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xc
 	.long	.LASF64
-	.byte	0xd1
-	.long	0x2f1
+	.byte	0xd2
+	.long	0x2fe
 	.uleb128 0xc
 	.long	.LASF65
-	.byte	0xd2
-	.long	0x2f1
+	.byte	0xd3
+	.long	0x2fe
 	.uleb128 0xc
 	.long	.LASF66
-	.byte	0xd4
-	.long	0x2f1
+	.byte	0xd5
+	.long	0x2fe
 	.uleb128 0x3
 	.long	.LASF67
-	.byte	0xd5
+	.byte	0xd6
 	.byte	0x5
 	.long	0x82
-	.long	0x533
+	.long	0x540
 	.uleb128 0x1
 	.byte	0
 	.uleb128 0xd
 	.long	.LASF68
-	.byte	0xd6
+	.byte	0xd7
 	.byte	0x5
 	.long	0x82
 	.uleb128 0x1
@@ -1270,49 +1277,49 @@ _start:
 	.long	0x224
 	.uleb128 0x15
 	.long	0x1b0
-	.long	0x556
+	.long	0x563
 	.uleb128 0x21
 	.long	0x74
 	.byte	0x27
 	.byte	0
 	.uleb128 0x10
 	.long	.LASF70
-	.byte	0x8e
+	.byte	0x8f
 	.long	.LFB7
 	.long	.LFE7-.LFB7
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x579
+	.long	0x586
 	.uleb128 0x12
 	.string	"str"
-	.byte	0x8e
+	.byte	0x8f
 	.byte	0x12
-	.long	0x2f1
+	.long	0x2fe
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 0
 	.byte	0
 	.uleb128 0x13
 	.long	.LASF79
-	.byte	0x76
+	.byte	0x77
 	.byte	0x9
-	.long	0x2b3
+	.long	0x2c0
 	.long	.LFB6
 	.long	.LFE6-.LFB6
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x5d7
+	.long	0x5e4
 	.uleb128 0x12
 	.string	"fn"
-	.byte	0x76
+	.byte	0x77
 	.byte	0x24
-	.long	0x282
+	.long	0x28f
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 0
 	.uleb128 0x9
 	.long	.LASF72
-	.byte	0x76
+	.byte	0x77
 	.byte	0x2e
 	.long	0x12a
 	.uleb128 0x2
@@ -1320,7 +1327,7 @@ _start:
 	.sleb128 4
 	.uleb128 0x9
 	.long	.LASF73
-	.byte	0x76
+	.byte	0x77
 	.byte	0x39
 	.long	0x82
 	.uleb128 0x2
@@ -1328,15 +1335,15 @@ _start:
 	.sleb128 8
 	.uleb128 0x11
 	.long	.LASF74
-	.byte	0x78
+	.byte	0x79
 	.byte	0xd
-	.long	0x2b3
+	.long	0x2c0
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 -20
 	.uleb128 0xd
 	.long	.LASF58
-	.byte	0x61
+	.byte	0x62
 	.byte	0x17
 	.long	0x82
 	.uleb128 0x1
@@ -1344,31 +1351,31 @@ _start:
 	.byte	0
 	.uleb128 0x10
 	.long	.LASF75
-	.byte	0x60
+	.byte	0x61
 	.long	.LFB5
 	.long	.LFE5-.LFB5
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x63e
+	.long	0x64b
 	.uleb128 0x9
 	.long	.LASF33
-	.byte	0x60
+	.byte	0x61
 	.byte	0x1c
-	.long	0x2b3
+	.long	0x2c0
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 0
 	.uleb128 0x12
 	.string	"fn"
-	.byte	0x60
+	.byte	0x61
 	.byte	0x30
-	.long	0x282
+	.long	0x28f
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 4
 	.uleb128 0x9
 	.long	.LASF72
-	.byte	0x60
+	.byte	0x61
 	.byte	0x3a
 	.long	0x12a
 	.uleb128 0x2
@@ -1376,7 +1383,7 @@ _start:
 	.sleb128 8
 	.uleb128 0x9
 	.long	.LASF73
-	.byte	0x60
+	.byte	0x61
 	.byte	0x45
 	.long	0x82
 	.uleb128 0x2
@@ -1384,15 +1391,15 @@ _start:
 	.sleb128 12
 	.uleb128 0x11
 	.long	.LASF76
-	.byte	0x61
+	.byte	0x62
 	.byte	0xf
-	.long	0x63e
+	.long	0x64b
 	.uleb128 0x2
 	.byte	0x91
 	.sleb128 -20
 	.uleb128 0xd
 	.long	.LASF58
-	.byte	0x61
+	.byte	0x62
 	.byte	0x17
 	.long	0x82
 	.uleb128 0x1
@@ -1403,7 +1410,7 @@ _start:
 	.uleb128 0x22
 	.long	.LASF77
 	.byte	0x1
-	.byte	0x4a
+	.byte	0x4b
 	.byte	0x6
 	.long	.LFB4
 	.long	.LFE4-.LFB4
@@ -1412,7 +1419,7 @@ _start:
 	.uleb128 0x23
 	.long	.LASF78
 	.byte	0x1
-	.byte	0x44
+	.byte	0x45
 	.byte	0x6
 	.long	.LFB3
 	.long	.LFE3-.LFB3
@@ -1420,17 +1427,17 @@ _start:
 	.byte	0x9c
 	.uleb128 0x13
 	.long	.LASF80
-	.byte	0x39
+	.byte	0x3a
 	.byte	0xa
 	.long	0x68
 	.long	.LFB2
 	.long	.LFE2-.LFB2
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x6a6
+	.long	0x6b3
 	.uleb128 0x9
 	.long	.LASF81
-	.byte	0x39
+	.byte	0x3a
 	.byte	0x27
 	.long	0x14c
 	.uleb128 0x2
@@ -1441,7 +1448,7 @@ _start:
 	.long	.LBE2-.LBB2
 	.uleb128 0xd
 	.long	.LASF70
-	.byte	0x3d
+	.byte	0x3e
 	.byte	0x9
 	.long	0x82
 	.uleb128 0x1
@@ -1450,17 +1457,17 @@ _start:
 	.byte	0
 	.uleb128 0x13
 	.long	.LASF82
-	.byte	0x2e
+	.byte	0x2f
 	.byte	0xa
 	.long	0x68
 	.long	.LFB1
 	.long	.LFE1-.LFB1
 	.uleb128 0x1
 	.byte	0x9c
-	.long	0x6ce
+	.long	0x6db
 	.uleb128 0x9
 	.long	.LASF81
-	.byte	0x2e
+	.byte	0x2f
 	.byte	0x1f
 	.long	0x14c
 	.uleb128 0x2
@@ -1470,7 +1477,7 @@ _start:
 	.uleb128 0x25
 	.long	.LASF85
 	.byte	0x1
-	.byte	0x29
+	.byte	0x2a
 	.byte	0x6
 	.long	.LFB0
 	.long	.LFE0-.LFB0
@@ -1478,7 +1485,7 @@ _start:
 	.byte	0x9c
 	.uleb128 0x9
 	.long	.LASF81
-	.byte	0x29
+	.byte	0x2a
 	.byte	0x1d
 	.long	0x14c
 	.uleb128 0x2

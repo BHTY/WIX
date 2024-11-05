@@ -12,12 +12,18 @@ Thread cleanup
 Block List
 Sleep queues for synchronization objects
 Wait on a mutex / critical section
+Block for a file (read from keyboard!!!)
+    Waitable event objects are implemented quite simply. When you call WaitEvent(event) for an unsignalled event, the thread is immediately taken off
+    of of the active thread queue and placed onto the sleep queue. At the same time, the event object itself has a linked queue of threads waiting on
+    it. Once SignalEvent(event) is called, the first thread is popped off of the linked queue and woken up.
+
 
 Multiple address spaces
 
 
 === SLAB ALLOCATOR ===
-For threads and stuff
+Slab allocator objects can be created to reserve a pool of a fixed number of fixed-size objects (i.e. threads)
+When an object is deleted from the slab allocator, it is released to the pool
 
 
 === OTHER ===
