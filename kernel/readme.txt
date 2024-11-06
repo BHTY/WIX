@@ -75,6 +75,6 @@ Task Control Block
 
 
 Applications
-- Pong
+- Pong/Snake
 - Hex editor
 - Machine monitor
