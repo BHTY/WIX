@@ -1,1 +1,1 @@
-Todo
+I have a lot of ideas with fancy APCs and LPCs... let's learn the basics first!
