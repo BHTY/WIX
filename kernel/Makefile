@@ -14,7 +14,6 @@ OBJFILES		:= $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(CFILES)) $(patsubst $(SR
 override CFLAGS := $(CFLAGS) -Iinclude/libk -Iinclude
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
-		$(CC) $(CFLAGS) -S -o init.s src/init/init.c
 		$(CC) $(CFLAGS) $< -o $@
 $(BUILDDIR)/%.o: $(SRCDIR)/%.s
 		$(ASM) $< -f elf -o $@

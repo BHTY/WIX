@@ -71,8 +71,6 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
 
     tty_write("\n", 1);
     crash_dump(buf, state);
-
-    //dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
     
     while(1);
 }
