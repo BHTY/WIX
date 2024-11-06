@@ -5,5 +5,3 @@
 */
 
 #include <mm/slab.h>
-
-
