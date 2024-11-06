@@ -12,6 +12,7 @@ There needs to be some kind of list of "sleeping" processes. I.e. when a process
 - Mutex
 - Critical Section
 - File
+
 Waitable event objects are implemented quite simply. When you call a function to wait on an unsignalled event (i.e. trying to acquire a lock, for instance), the thread is taken off of the active thread list and placed onto the linked sleep queue for that event object. Once the event is signalled, the next thread on the queue is "popped" off and woken up.
 Like files, threads/processes are waitable objects that can be signalled. You can block for a thread's completion, and then when the thread completes, it signals the waiting threads and gives them the thread exit/return code.
 
