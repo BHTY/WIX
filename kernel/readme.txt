@@ -53,6 +53,8 @@ Create a new thread with a new virtual address space. Set its EIP to load_image 
 The new thread will then begin executing the kernel code load_image to map the executable into its memory space, and then will call 
 jump_usermode(entry_point, param) to begin executing the image file in user mode.
 
+Like files, threads are waitable objects that can be signalled. You can block for a thread's completion, and then when the thread completes, it signals
+the waiting threads and gives them the thread exit/return code.
 
 
 
