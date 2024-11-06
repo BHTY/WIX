@@ -33,7 +33,7 @@ Some kind of kernel debugger will need to be written. It doesn't need to be too 
 4. It will call ``jump_usermode(image_entry_point, 0)`` to begin executing the image file in Ring 3
 
 # Miscellaneous
-tbd
+- Signals?
 
 # Application Programs
 - Pong
