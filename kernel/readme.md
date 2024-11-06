@@ -14,6 +14,7 @@ There needs to be some kind of list of "sleeping" processes. I.e. when a process
 - File
 
 Waitable event objects are implemented quite simply. When you call a function to wait on an unsignalled event (i.e. trying to acquire a lock, for instance), the thread is taken off of the active thread list and placed onto the linked sleep queue for that event object. Once the event is signalled, the next thread on the queue is "popped" off and woken up.
+
 Like files, threads/processes are waitable objects that can be signalled. You can block for a thread's completion, and then when the thread completes, it signals the waiting threads and gives them the thread exit/return code.
 
 # Slab Allocator
@@ -55,4 +56,4 @@ tbd
 ---------- 0x00000000
 ```
 Applications dynamically allocate memory by requesting it from the system via the `void* sbrk(int)` system call, which raises the program break, extending the heap, and returning the new program break. If new pages are required to ensure that the entire heap is accessible, new pages will be committed and mapped into the address space. The stack expands downwards as the heap goes upwards. The kernel also has its own program break and heap.
-The logic is that a "heap" exists between the end of the data segment and the program break. In other words, there's a "heap start" and a "heap end".
+The logic is that a "heap" exists between the end of the data segment and the program break. In other words, there's a "heap start" and a "heap end", and more pages can be mapped to extend the heap end, which is increased by `sbrk`.
