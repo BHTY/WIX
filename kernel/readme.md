@@ -26,11 +26,24 @@ Mount the initrd (we can load executables from there!)
 # Kernel Debugger
 Some kind of kernel debugger will need to be written. It doesn't need to be too elaborate, just to let me poke around memory, and it needs to understand the OS's data structures. Ideally, I can treat the OS as one giant program and suspend it, or I can attach to and debug individual threads. The [minidbg](https://gitlab.com/bztsrc/minidbg) library may be of some assistance here. Any assertions should automatically break out into the debugger, which should probably be hosted over the COM port.
 
+Its core capabilities should be
+- Continue executing
+- Step in (trace) / step over / step out
+- Set breakpoint (including data breakpoints?)
+- Disassemble
+- Dump registers
+- Examine memory
+
 # Creating a Process
 1. Create a new thread with a new virtual address space (obviously, mapping the kernel in)
 2. Set its EIP to `start_thread_load_image_thunk` (a procedure entry point in the kernel) with its argument set to the path (or something) of the image file to be loaded 
 3. The new thread begins executing in kernel mode from `start_thread_load_image_thunk` to map the executable into its memory space
 4. It will call ``jump_usermode(image_entry_point, 0)`` to begin executing the image file in Ring 3
+
+# x86 Emulator
+An instruction-level i386 simulator will be written for two main purposes. First of all, it will be useful as a Valgrind-style debugging tool to instrument memory writes and detect tricky bugs. One could use this both for user-mode processes and executing part of the kernel inside of the emulator.
+
+In addition, the x86 emulator could be useful for executing the BIOS interrupt vectors (mainly the ``int 10h`` video BIOS and the ``int 13h`` disk BIOS services).
 
 # Miscellaneous
 - Signals?
@@ -40,7 +53,6 @@ Some kind of kernel debugger will need to be written. It doesn't need to be too 
 - Snake
 - Hex editor
 - Machine language monitor
-- User-mode i386 emulator (for debugging purposes)
 
 # Memory Map (User Mode)
 ```

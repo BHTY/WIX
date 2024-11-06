@@ -72,7 +72,7 @@ void _start(kernel_startup_params_t* params){
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);
 
-    char* str1 = "\x1B[33m[\x1B[H\x1B[JWelcome to WIX!\nPress any key to cause a crash.\n";
+    char* str1 = "\x1B[33m[\x1B[H\x1B[JWelcome to WIX!\nPress any key to cause a crash.\n"; //I LOVE NICOLE!
 
     tty_write(str1, strlen(str1));
 

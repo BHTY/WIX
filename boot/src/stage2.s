@@ -356,7 +356,7 @@ end_putc:
     pop ebp
     ret 0x4
 
-welcome_msg: db "Welcome to stage 2!", 0x0a, 0x0d, 0
+welcome_msg: db "Welcome to stage 2! I love Nicole!", 0x0a, 0x0d, 0
 mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
 
 charset: db "0123456789ABCDEF"
