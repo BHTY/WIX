@@ -30,7 +30,7 @@ Some kind of kernel debugger will need to be written. It doesn't need to be too 
 1. Create a new thread with a new virtual address space (obviously, mapping the kernel in)
 2. Set its EIP to `start_thread_load_image_thunk` (a procedure entry point in the kernel) with its argument set to the path (or something) of the image file to be loaded 
 3. The new thread begins executing in kernel mode from `start_thread_load_image_thunk` to map the executable into its memory space
-4. It will call ``jump_usermode(image_entry_point, 0)`` to begin executing the image file in user mode
+4. It will call ``jump_usermode(image_entry_point, 0)`` to begin executing the image file in Ring 3
 
 # Miscellaneous
 tbd
@@ -40,6 +40,7 @@ tbd
 - Snake
 - Hex editor
 - Machine language monitor
+- User-mode i386 emulator (for debugging purposes)
 
 # Memory Map (User Mode)
 ```
