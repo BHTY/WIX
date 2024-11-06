@@ -29,6 +29,10 @@ Slab allocator objects can be created to reserve a pool of a fixed number of fix
 When an object is deleted from the slab allocator, it is released to the pool
 
 
+=== I/O SUBSYSTEM & VIRTUAL FILESYSTEM ===
+Mount the initrd (we can load executables from here)
+
+
 === OTHER ===
 - Kernel debugger
 - Loading additional processes
@@ -42,8 +46,18 @@ If new pages are required to ensure that the entire heap is accessible, new page
 The stack expands downwards as the heap goes upwards
 
 
+
+
+CREATING A PROCESS
+Create a new thread with a new virtual address space. Set its EIP to load_image and its argument to the path (or something?) of the image file
+The new thread will then begin executing the kernel code load_image to map the executable into its memory space, and then will call 
+jump_usermode(entry_point, param) to begin executing the image file in user mode.
+
+
+
+
 User Mode Memory Map
-----------
+---------- 0x80000000
 | Stack  |
 |        |
 |        |
