@@ -1,3 +1,9 @@
+# Priority Tracker
+1.) Bug fixes
+2.) Slab Allocator
+3.) x86 Emulator
+4.) Blocking
+
 # Bug fixes
 The kernel heap seems buggy...
 
@@ -36,8 +42,8 @@ Its core capabilities should be
 
 # Creating a Process
 1. Create a new thread with a new virtual address space (obviously, mapping the kernel in)
-2. Set its EIP to `start_thread_load_image_thunk` (a procedure entry point in the kernel) with its argument set to the path (or something) of the image file to be loaded 
-3. The new thread begins executing in kernel mode from `start_thread_load_image_thunk` to map the executable into its memory space
+2. Set its EIP to `start_user_thread_load_image_thunk` (a procedure entry point in the kernel) with its argument set to the path (or something) of the image file to be loaded 
+3. The new thread begins executing in kernel mode from `start_user_thread_load_image_thunk` to map the executable into its memory space
 4. It will call ``jump_usermode(image_entry_point, 0)`` to begin executing the image file in Ring 3
 
 # x86 Emulator

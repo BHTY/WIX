@@ -133,14 +133,14 @@ void proc_char(int ch){
             if (ch == 0x1B){
                 cur_mode = AWAITING_BRACKET;
             } else {
-                bootvid_putc(ch);
+                bootvid_putch(ch);
             }
             break;
         case AWAITING_BRACKET:
             if (ch == '['){
                 cur_mode = AWAITING_ARG;
             } else {
-                bootvid_putc(ch);
+                bootvid_putch(ch);
                 cur_mode = AWAITING_ESC;
             }
             break;

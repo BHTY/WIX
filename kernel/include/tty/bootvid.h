@@ -6,7 +6,7 @@
 #define COLS 25
 
 void bootvid_init();
-void bootvid_putc(char ch);
+void bootvid_putch(char ch);
 void bootvid_fg(char fg);
 void bootvid_bg(char bg);
 uint16_t bootvid_getx();

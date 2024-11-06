@@ -36,7 +36,7 @@ void bootvid_init(){
     bootvid_gotoxy(0, 0);
 }
 
-void bootvid_putc(char ch){
+void bootvid_putch(char ch){
     if (ch == 0x0A){
         bootvid_cursor = ROWS + (bootvid_cursor - (bootvid_cursor % ROWS));
     } else if (ch == 0x0D) {

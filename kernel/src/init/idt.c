@@ -26,6 +26,21 @@ isr_func set_isr(int index, isr_func new_func){
     return old_func;
 }
 
+void trace(int_state_t* state){
+    uint32_t EBP = state->ebp;
+    int i = 5;
+
+    while(EBP && i){
+        if(*(uint32_t*)(EBP+4)){
+            dbg_printf("%x\n", *(uint32_t*)(EBP+4));
+        } else{
+            break;
+        }
+        EBP = *(uint32_t*)EBP;
+        i--;
+    }
+}
+
 void crash_dump(char* buf, int_state_t* state){
     sprintf(buf, "EAX: 0x%x\nECX: 0x%x\nEDX: 0x%x\nEBX: 0x%x\nEBP: 0x%x\nESP: 0x%x\nESI: 0x%x\nEDI: 0x%x\n\n", state->eax, state->ecx, state->edx, state->ebx, state->ebp, state->esp, state->esi, state->edi);
     tty_write(buf, strlen(buf));
@@ -35,7 +50,7 @@ void crash_dump(char* buf, int_state_t* state){
     for(int i = 0; i < 32; i += 4){
         sprintf(buf, "[ESP+0x%X] = 0x%x\n", i, *(uint32_t*)(state->esp + i));
         tty_write(buf, strlen(buf));
-    }   
+    }
 }
 
 void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, uint32_t eip){
