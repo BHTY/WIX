@@ -1,3 +1,9 @@
+/* 
+    Copyright (C) 2024 WIX Kernel
+    Authored by Will Klees
+    thread.c - Multithreading scheduler
+*/
+
 #include <thread/thread.h>
 #include <init/io.h>
 #include <init/pic.h>
@@ -36,6 +42,7 @@ void init_tasking(){
 void thread_exit(){
     disable_interrupts();
     dbg_printf("Thread exit!\n");
+    // TODO: cleanup the thread
     while(1);
 }
 

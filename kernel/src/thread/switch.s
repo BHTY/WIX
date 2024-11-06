@@ -7,11 +7,10 @@ struc TASK
 endstruc
 
 extern cur_task
-global task_switch
-
 extern tss_entry
 
 ; void task_switch(int_state_t*)
+global task_switch
 task_switch:
     mov edx, [esp+4]
 
@@ -46,8 +45,6 @@ task_switch:
     popfd
 
     ret
-
-extern print
 
 global thread_fun_1
 thread_fun_1:

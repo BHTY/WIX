@@ -7,6 +7,8 @@ Kernel heap
 
 
 === MULTITHREADING ===
+Add thread local storage (Win32-like mechanism; FS register points to TEB)
+
 Improve the timeslice scheduler
 
 Thread cleanup
@@ -18,7 +20,6 @@ Block for a file (read from keyboard!!!)
     Waitable event objects are implemented quite simply. When you call WaitEvent(event) for an unsignalled event, the thread is immediately taken off
     of of the active thread queue and placed onto the sleep queue. At the same time, the event object itself has a linked queue of threads waiting on
     it. Once SignalEvent(event) is called, the first thread is popped off of the linked queue and woken up.
-
 
 Multiple address spaces
 
@@ -55,3 +56,9 @@ User Mode Memory Map
 ---------- 0x00000000
 
 Task Control Block
+
+
+Applications
+- Pong
+- Hex editor
+- Machine monitor

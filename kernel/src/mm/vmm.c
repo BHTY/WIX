@@ -1,3 +1,9 @@
+/* 
+    Copyright (C) 2024 WIX Kernel
+    Authored by Will Klees
+    vmm.c - Virtual memory manager
+*/
+
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 

@@ -41,6 +41,12 @@ uint32_t syscall_handler(int_state_t* state){
 uint32_t thread_fun_1(void* param);
 uint32_t thread_fun_2(void* param);
 
+uint32_t thread_fun_3(void* param){
+    while(1){
+        (*(uint8_t*)(0xB8000))++;
+    }
+}
+
 void _start(kernel_startup_params_t* params){
     char buf[40];
     int n = 0;

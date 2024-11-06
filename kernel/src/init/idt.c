@@ -96,7 +96,6 @@ __attribute__((noreturn)) uint32_t exception_handler(int code, int_state_t state
 /* Base exception handler */
 __attribute__((noreturn)) uint32_t old_exception_handler(int code, uint32_t error_code){
 
-
     dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
     
     if(code == 0x0E){
