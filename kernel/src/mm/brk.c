@@ -7,6 +7,7 @@ vaddr_t brk_end = 0x100000;
 extern void (*dbg_printf)(const char*, ...);
 
 void* sbrk(size_t increment){
+    vaddr_t old_brk = brk;
     vaddr_t new_brk = brk + increment;
 
     while(new_brk > brk_end){
@@ -20,5 +21,5 @@ void* sbrk(size_t increment){
 
     dbg_printf("Raised program break by %x bytes to %x\n", increment, brk);
 
-    return (void*)brk;
+    return (void*)old_brk;
 }

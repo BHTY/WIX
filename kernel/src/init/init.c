@@ -49,23 +49,20 @@ uint32_t thread_fun_3(void* param){
 
 void _start(kernel_startup_params_t* params){
     char buf[40];
-    int n = 0;
-    pmm_init();
 
     dbg_printf = params->printf;
-
-    sbrk(0x100000);
-    heap_init();
+    
+    pmm_init();
+    heap_init(0x100000);
     init_tasking();
     pic_remap(0x70, 0x78);
     idt_init();
-    //set_isr(0x70, pit_isr);
+    gdt_init();
     set_isr(0x80, syscall_handler);
     
-    gdt_init();
-
     unmap_page(cur_task->cr3, 0x0);
 
+    // set pit reload frequency
     io_write_8(0x43, 52);
 	io_write_8(0x40, 0xdf);
 	io_write_8(0x40, 0x4);
@@ -83,9 +80,4 @@ void _start(kernel_startup_params_t* params){
         sprintf(buf, "\x0DTime: %d", interrupt_tick);
         tty_write(buf, strlen(buf));
     }
-
-    params->printf("Welcome to the WIX kernel!\nBuilt %s %s\n", __DATE__, __TIME__);
-    sprintf(buf, "%d KB Extended Memory\n", params->mem_size);
-    params->printf(buf);
-
 }

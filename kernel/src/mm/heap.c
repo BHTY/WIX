@@ -4,6 +4,7 @@
     heap.c - Kernel heap functions
 */
 
+#include <mm/brk.h>
 #include <mm/heap.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -40,10 +41,10 @@ void heap_print(){
     while(blk = heap_walk(blk, print_heap_entry));
 }
 
-void heap_init(){
+void heap_init(size_t size){
     mem_block_t temp;
-    heap_size = 0x100000;
-    heap_start = (void*)0x100000;
+    heap_size = size;
+    heap_start = sbrk(size);
 	temp.used = 0;
 	temp.size = heap_size - sizeof(mem_block_t);
 	temp.prev = 0;
