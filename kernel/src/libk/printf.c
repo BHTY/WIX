@@ -46,6 +46,7 @@ int32_t numtostr(uint8_t *str, int num, int base, int sign, int digits){ //0=uns
 	}
 
 	int places = ilog(num, base);
+    places = (places == 0) ? 1 : places;
 
     for(; i < (digits - places); i++){
             str[i] = '0';

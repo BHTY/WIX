@@ -1,8 +1,8 @@
 # Priority Tracker
-1.) Bug fixes
-2.) Slab Allocator
-3.) x86 Emulator
-4.) Blocking
+1. Bug fixes
+2. Slab Allocator
+3. x86 Emulator
+4. Blocking
 
 # Bug fixes
 The kernel heap seems buggy...
