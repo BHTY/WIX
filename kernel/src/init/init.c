@@ -60,7 +60,11 @@ void _start(kernel_startup_params_t* params){
     gdt_init();
     set_isr(0x80, syscall_handler);
     
+    dbg_printf("INT 10H entry point = %x:%x\n", *(uint16_t*)(0x42), *(uint16_t*)(0x40));
+
     unmap_page(cur_task->cr3, 0x0);
+
+    //pwhile(1);
 
     // set pit reload frequency
     io_write_8(0x43, 52);

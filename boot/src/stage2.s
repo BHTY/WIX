@@ -99,7 +99,7 @@ start_protected_mode:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	mov ebp, 0x7C00
+	mov ebp, 0x90000;0x7C00
 	mov esp, ebp
 
     mov byte [0xb8000], 'A'
