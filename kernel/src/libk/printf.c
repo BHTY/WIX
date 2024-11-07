@@ -34,7 +34,7 @@ char hexch(uint8_t num){ //for a number between 0 and 15, get the hex digit 0-f
 }
 
 int32_t numtostr(uint8_t *str, int num, int base, int sign, int digits){ //0=unsigned, 1=signed
-	uint32_t i;
+	int i;
 	
 	if (sign && (num < 0)){
 		str[0] = '-';
@@ -45,10 +45,10 @@ int32_t numtostr(uint8_t *str, int num, int base, int sign, int digits){ //0=uns
 		i = 0;
 	}
 
-	uint32_t places = ilog(num, base);
+	int places = ilog(num, base);
 
     for(; i < (digits - places); i++){
-        str[i] = '0';
+            str[i] = '0';
     }
 
 	while (places > 1){
@@ -82,8 +82,6 @@ int vsprintf(char* buf, const char* fmt, va_list args){
 	uint16_t len;
 	char *s;
     int digits = 0;
-
-    buf[0] = 0;
 
 	for (str = buf; *fmt; ++fmt){
 

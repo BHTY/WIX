@@ -60,11 +60,11 @@ void _start(kernel_startup_params_t* params){
     gdt_init();
     set_isr(0x80, syscall_handler);
     
-    /*uint16_t int10_seg = *(uint16_t*)(0x42);
+    uint16_t int10_seg = *(uint16_t*)(0x42);
     uint16_t int10_off = *(uint16_t*)(0x40);
-    dbg_printf("INT 10H entry point = %x:%x\n", int10_seg, int10_off);*/
+    dbg_printf("INT 10H entry point = %x:%x\n", int10_seg, int10_off);
 
-    //unmap_page(cur_task->cr3, 0x0);
+    unmap_page(cur_task->cr3, 0x0);
 
     // set pit reload frequency
     io_write_8(0x43, 52);
@@ -72,8 +72,6 @@ void _start(kernel_startup_params_t* params){
 	io_write_8(0x40, 0x4);
 
     tty_init();
-
-    //assert(0);
 
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);

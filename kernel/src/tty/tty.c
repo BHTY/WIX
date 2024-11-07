@@ -27,7 +27,7 @@ int started_arg = 0;
 char ansi_to_vga[] = {0, 4, 2, 14, 1, 5, 3, 15, 0, 15};
 
 void do_graphics_cmd(int arg){
-    dbg_printf("Graphics command %x\n", arg);
+    //dbg_printf("Graphics command %x\n", arg);
 
     if (arg >= 40){
         bootvid_bg(ansi_to_vga[arg - 40]);
@@ -38,7 +38,7 @@ void do_graphics_cmd(int arg){
 
 void do_erase(int arg){
     int start, end;
-    dbg_printf("Erase command %x\n", arg);
+    //dbg_printf("Erase command %x\n", arg);
     
     switch(arg){
         case 0:
@@ -103,7 +103,7 @@ void do_ansi_cmd(int ch){
                 arg1 = 0;
                 arg2 = 0;
             }
-            dbg_printf("Cursor movement to %x, %x\n", arg1, arg2);
+            //dbg_printf("Cursor movement to %x, %x\n", arg1, arg2);
             bootvid_gotoxy(arg1, arg2);
             break;
         case 'm': // color/graphics
@@ -126,7 +126,7 @@ void do_ansi_cmd(int ch){
 }
 
 void proc_char(int ch){
-    dbg_printf("ch=%c Mode=%x\n", ch, cur_mode);
+    //dbg_printf("ch=%c Mode=%x\n", ch, cur_mode);
 
     switch(cur_mode){
         case AWAITING_ESC:
