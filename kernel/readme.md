@@ -24,7 +24,7 @@ Waitable event objects are implemented quite simply. When you call a function to
 Like files, threads/processes are waitable objects that can be signalled. You can block for a thread's completion, and then when the thread completes, it signals the waiting threads and gives them the thread exit/return code.
 
 # Slab Allocator
-Allocating frequently-used objects such as Task Control Blocks from the kernel heap is inefficient and promotes memory fragmentation. To avoid this, a slab cache can be created to reserve a pool of fixed-size objects. Similar to the page frame manager, objects in the slab cache are tracked via a bitmap, one bit per position. When an object is allocated, the bit is set. When an object is freed, it's released back into the pool and the bit is cleared.
+Allocating frequently-used objects such as Task Control Blocks and inodes from the kernel heap is inefficient and promotes memory fragmentation. To avoid this, a slab cache can be created to reserve a pool of fixed-size objects. Similar to the page frame manager, objects in the slab cache are tracked via a bitmap, one bit per position. When an object is allocated, the bit is set. When an object is freed, it's released back into the pool and the bit is cleared.
 
 # I/O Subsystem & Virtual Filesystem
 Mount the initrd (we can load executables from there!)

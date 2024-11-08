@@ -9,7 +9,7 @@
 #include <init/gdt.h>
 
 gdt_descriptor_t gdtr;
-gdt_entry_t gdt[6]; // one null segment, two ring 0 segments, two ring 3 segments, TSS
+gdt_entry_t gdt[7]; // one null segment, two ring 0 segments, two ring 3 segments, TSS, one for per-thread stuff
 tss_entry_t tss_entry;
 
 void install_tss(gdt_entry_t *g) {
@@ -51,6 +51,7 @@ void init_flat_selectors(){
     gdt_entry_t* ring0_data = &gdt[2];
     gdt_entry_t* ring3_code = &gdt[3];
     gdt_entry_t* ring3_data = &gdt[4];
+    gdt_entry_t* tls_entry = &gdt[6];
 
     ring3_code->limit_low = 0xFFFF;
     ring3_code->base_low = 0;
@@ -76,12 +77,14 @@ void init_flat_selectors(){
 
     *ring0_data = *ring0_code; // contents are similar so save time by copying
     ring0_data->code = 0; // not code but data
+
+    *tls_entry = *ring3_data; // basically the same... fill in stuff here
 }
 
 /* Sets up flat selectors for Ring 0/3 code/data & TSS */
 void gdt_init(){
     gdtr.base = (uint32_t)gdt;
-    gdtr.limit = (sizeof(gdt_entry_t) * 6) - 1;
+    gdtr.limit = sizeof(gdt) - 1;
 
     init_flat_selectors();
     

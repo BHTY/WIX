@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ios/blockdev.h>
+
 #define BSIZE 512
 #define NBUF 8
 

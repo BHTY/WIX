@@ -18,3 +18,6 @@ typedef struct tar_header{
     char minor[8];
     char prefix[155];
 } tar_header_t;
+
+void tar_mount(int blkdev);
+inode_t* tar_open(char* filename);

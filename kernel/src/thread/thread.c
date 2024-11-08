@@ -37,6 +37,11 @@ void init_tasking(){
     __asm__ volatile("movl %cr3, %eax");
     __asm__ volatile ("movl %%eax, %0" : "=a" (base_task.cr3));
     set_isr(0x70, pit_isr);
+
+    // set pit reload frequency
+    io_write_8(0x43, 52);
+	io_write_8(0x40, 0xdf);
+	io_write_8(0x40, 0x4);
 }
 
 void thread_exit(){

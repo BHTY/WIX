@@ -7,6 +7,8 @@
 #include <ios/blockdev.h>
 #include <ios/buf.h>
 
+extern void (*dbg_printf)(const char*, ...);
+
 // buf_ptr+1 = LRU, buf_ptr = MRU, buf_ptr-1 = 2nd MRU
 buf_t buffers[NBUF]; // circular LRU array
 int buf_ptr;

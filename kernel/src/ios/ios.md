@@ -45,6 +45,8 @@ Some file calls cannot be executed immediately. In that case, they will either b
 - ioctl
 A few system calls to deal with polling whether a device has data available may also be in order.
 
+Stuff for dealing with iterating over files in a directory, changing the current directory, etc.
+
 ## Current Implementation Plans
 The bootloader loads a TAR file from the boot disk, which is the initial ramdisk. During kernel initialization, it will:
 1. Register the ramdisk block device (passing it the memory address where the initrd was loaded and the number of sectors), which returns an integer representing the block device number

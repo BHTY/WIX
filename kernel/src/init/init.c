@@ -21,6 +21,8 @@
 #include <basedrv/ramdisk.h>
 #include <ios/blockdev.h>
 #include <ios/buf.h>
+#include <ios/inode.h>
+#include <basedrv/fs/ustar.h>
 
 typedef struct kernel_startup_params {
     uint16_t kernel_sectors;
@@ -50,11 +52,21 @@ uint32_t thread_fun_3(void* param){
     }
 }
 
+void fs_test(kernel_startup_params_t* params, const char* filename){
+    char buffer[512];
+    int n_ramdisk = install_ramdisk((uint8_t*)0x40000, params->ramdisk_sectors);
+    tar_mount(n_ramdisk);
+    inode_t* ip = tar_open(filename);
+
+    if (ip){
+        int n = readi(ip, buffer, 0, 20);
+        dbg_printf("Read %x bytes from %s\n", n, filename);
+        dbg_printf("%s", buffer);
+    }
+}
+
 void _start(kernel_startup_params_t* params){
     char buf[40];
-
-    char sector_buf[512];
-    buf_t* b;
 
     dbg_printf = params->printf;
     
@@ -65,29 +77,14 @@ void _start(kernel_startup_params_t* params){
     idt_init();
     gdt_init();
     set_isr(0x80, syscall_handler);
-    
-    uint16_t int10_seg = *(uint16_t*)(0x42);
-    uint16_t int10_off = *(uint16_t*)(0x40);
-    dbg_printf("INT 10H entry point = %x:%x\n", int10_seg, int10_off);
 
     unmap_page(cur_task->cr3, 0x0);
-
-    // set pit reload frequency
-    io_write_8(0x43, 52);
-	io_write_8(0x40, 0xdf);
-	io_write_8(0x40, 0x4);
 
     tty_init();
 
     binit();
 
-    int n_ramdisk = install_ramdisk(0x40000, params->ramdisk_sectors);
-    //block_devs[n_ramdisk].read(&(block_devs[n_ramdisk]), sector_buf, 0);
-
-    dbg_printf("Loaded ramdisk at index %x\n", n_ramdisk);
-    b = bread(n_ramdisk, 0);
-    dbg_printf("%s\n", b->data);
-    //dbg_printf("%s\n", sector_buf);
+    fs_test(params, "test.txt");
 
     while(1);
 

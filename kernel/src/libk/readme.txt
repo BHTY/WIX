@@ -1,13 +1,13 @@
 libk implements a minimal C runtime library for the kernel's use, implementing the following functions:
 
     string.h
-int memcmp(const void *str1, const void *str2, size_t n);
+int memcmp(const void *str1, const void *str2, size_t n);           DONE
 void *memcpy(void *dest, const void *src, size_t n);
 void *memmove(void *dest, const void *src, size_t n);
 void *memset(void *str, int c, size_t n);                           DONE
 char *strcat(char *dest, const char *src);                          DONE
 char *strchr(const char *str, int c);
-int strcmp(const char *str1, const char *str2);
+int strcmp(const char *str1, const char *str2);                     DONE
 char *strcpy(char *dest, const char *src);                          DONE
 size_t strlen(const char *str);                                     DONE
 
