@@ -6,6 +6,7 @@
 
 #include <ios/blockdev.h>
 #include <ios/buf.h>
+#include <string.h>
 
 extern void (*dbg_printf)(const char*, ...);
 

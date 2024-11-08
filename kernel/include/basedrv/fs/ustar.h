@@ -20,4 +20,4 @@ typedef struct tar_header{
 } tar_header_t;
 
 void tar_mount(int blkdev);
-inode_t* tar_open(char* filename);
+inode_t* tar_open(const char* filename);

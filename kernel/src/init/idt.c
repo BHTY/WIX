@@ -11,6 +11,7 @@
 #include <init/pic.h>
 #include <tty/tty.h>
 #include <stdio.h>
+#include <kd/dis/dis386.h>
 
 __attribute__((aligned(0x10))) static idt_entry_t idt[256];
 
@@ -94,7 +95,7 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
         sprintf(buf, "\n%08x: ", eip);
         tty_write(buf, strlen(buf));
 
-        disasm_opcode(buf, eip, eip, 1, 1, 0, 0, 0);
+        disasm_opcode(buf, (uint8_t*)eip, eip, 1, 1, 0, 0, 0);
 
         tty_write(buf, strlen(buf));
     }

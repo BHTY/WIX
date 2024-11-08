@@ -7,6 +7,7 @@
 #include <ios/buf.h>
 #include <ios/inode.h>
 #include <init/panic.h>
+#include <string.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 

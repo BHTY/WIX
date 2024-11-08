@@ -37,10 +37,10 @@ void tar_mount(int blkdev){
 }
 
 /* */
-inode_t* tar_open(char* filename){
+inode_t* tar_open(const char* filename){
     blknum_t blknum = 0;
     buf_t* b = bread(devnum, blknum);
-    tar_header_t* hdr = b->data;
+    tar_header_t* hdr = (tar_header_t*)b->data;
 
     while(!memcmp(hdr->ustar, "ustar", 5)){
         int filesize = oct2bin(hdr->file_size, 11);
@@ -53,7 +53,7 @@ inode_t* tar_open(char* filename){
 
         blknum += (((filesize + 511) / 512) + 1);
         b = bread(devnum, blknum);
-        hdr = b->data;
+        hdr = (tar_header_t*)b->data;
     }
 
     return NULL;
