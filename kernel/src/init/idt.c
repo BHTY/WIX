@@ -46,7 +46,6 @@ void crash_dump(char* buf, int_state_t* state){
     tty_write(buf, strlen(buf));
     
     //stack dump
-
     for(int i = 0; i < 32; i += 4){
         sprintf(buf, "[ESP+0x%02X] = 0x%08X\n", i, *(uint32_t*)(state->esp + i));
         tty_write(buf, strlen(buf));

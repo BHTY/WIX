@@ -8,361 +8,360 @@
      8 00000000 EA[0500]0000            jmp 0:go
      9                                  
     10                                  go:
-    11                                  
-    12                                  ;mov ax, cs
-    13                                  ;mov ds, ax
-    14                                  ;mov ss, ax
-    15                                  ;xor ax, ax
-    16 00000005 31C0                    xor ax, ax
-    17 00000007 8ED8                    mov ds, ax
-    18 00000009 8ED0                    mov ss, ax
-    19 0000000B BC007C                  mov sp, 0x7c00
-    20                                  
-    21                                  ; read drive geometry
-    22 0000000E 8816[C801]              mov [disk_num], dl
-    23 00000012 B408                    mov ah, 0x08
-    24 00000014 CD13                    int 0x13 ; Dh = # of heads - 1, CL & 0x3F = sectors per track
-    25 00000016 FEC6                    inc dh
-    26 00000018 8836[CB01]              mov [num_heads], dh
-    27 0000001C 80E13F                  and cl, 0x3f
-    28 0000001F 880E[C901]              mov [sectors_per_track], cl
-    29                                  
-    30                                  ;push welcome_msg
-    31                                  ;call puts
-    32                                  
-    33                                  ; load stage2.bin
-    34 00000023 BE[D801]                mov si, stage2_name
-    35 00000026 6A00                    push 0x0000
-    36 00000028 68E007                  push STAGE2_SEGMENT
-    37 0000002B E86101                  call load_file
-    38                                  
-    39                                  ; load the kernel image
-    40 0000002E BE[CD01]                mov si, kernel_name
-    41 00000031 6A00                    push 0x0000
-    42 00000033 680010                  push KERNEL_SEGMENT
-    43 00000036 E85601                  call load_file
-    44 00000039 A3[C401]                mov word [kernel_sectors], ax
-    45                                  
-    46                                  ; load the ramdisk
-    47                                  
-    48                                  ; push kernel_sectors & ramdisk_sectors
-    49 0000003C 68[C401]                push kernel_sectors
-    50 0000003F 68[C601]                push ramdisk_sectors
-    51 00000042 E9(007E)                jmp (STAGE2_SEGMENT << 4)
-    52                                  
-    53 00000045 EBFE                    jmp $
-    54                                  
-    55                                  puts: 
-    56 00000047 55                          push bp
-    57 00000048 89E5                        mov bp, sp
-    58 0000004A 8B7604                      mov si, word [bp+4]
-    59                                  
-    60                                      puts_loop:
-    61 0000004D 8A04                            mov al, byte [si]
-    62 0000004F 46                              inc si
-    63 00000050 3C00                            cmp al, 0
-    64 00000052 7406                            je puts_done
-    65 00000054 B40E                            mov ah, 0x0e
-    66 00000056 CD10                            int 0x10
-    67 00000058 EBF3                            jmp puts_loop
-    68                                  
-    69                                      puts_done:
-    70 0000005A 5D                              pop bp
-    71 0000005B C20200                          ret 0x2
-    72                                  
-    73                                  print_int:
-    74 0000005E 55                          push bp
-    75 0000005F 89E5                        mov bp, sp
-    76 00000061 8B4604                      mov ax, word [bp+4]
-    77 00000064 31D2                        xor dx, dx
-    78 00000066 B90010                      mov cx, 0x1000
-    79 00000069 BB[E301]                    mov bx, charset
-    80                                  
-    81                                      print_int_loop:
-    82 0000006C F7F1                            div cx
-    83 0000006E B40E                            mov ah, 0x0e
-    84 00000070 D7                              xlat
-    85 00000071 CD10                            int 0x10
-    86 00000073 89D0                            mov ax, dx
-    87 00000075 31D2                            xor dx, dx
-    88 00000077 C1E904                          shr cx, 4
-    89 0000007A 83F900                          cmp cx, 0
-    90 0000007D 75ED                            jne print_int_loop
-    91                                  
-    92 0000007F 5D                          pop bp
-    93 00000080 C20200                      ret 0x2
+    11 00000005 31C0                    xor ax, ax
+    12 00000007 8ED8                    mov ds, ax
+    13 00000009 8ED0                    mov ss, ax
+    14 0000000B BC007C                  mov sp, 0x7c00
+    15                                  
+    16                                  ; read drive geometry
+    17 0000000E 8816[BD01]              mov [disk_num], dl
+    18 00000012 B408                    mov ah, 0x08
+    19 00000014 CD13                    int 0x13 ; Dh = # of heads - 1, CL & 0x3F = sectors per track
+    20 00000016 FEC6                    inc dh
+    21 00000018 8836[C001]              mov [num_heads], dh
+    22 0000001C 80E13F                  and cl, 0x3f
+    23 0000001F 880E[BE01]              mov [sectors_per_track], cl
+    24                                  
+    25                                  ; load stage2.bin
+    26 00000023 BE[D401]                mov si, stage2_name
+    27 00000026 6A00                    push 0x0000
+    28 00000028 68E007                  push STAGE2_SEGMENT
+    29 0000002B E85A01                  call load_file
+    30                                  
+    31                                  ; load the kernel image
+    32 0000002E BE[C201]                mov si, kernel_name
+    33 00000031 6A00                    push 0x0000
+    34 00000033 680010                  push KERNEL_SEGMENT
+    35 00000036 E84F01                  call load_file
+    36 00000039 A3[B901]                mov word [kernel_sectors], ax
+    37                                  
+    38                                  ; load the ramdisk
+    39 0000003C BE[CD01]                mov si, ramdisk_name
+    40 0000003F 6A00                    push 0x0000
+    41 00000041 680040                  push RAMDISK_SEGMENT
+    42 00000044 E84101                  call load_file
+    43 00000047 A3[BB01]                mov word [ramdisk_sectors], ax
+    44                                  
+    45                                  ; push kernel_sectors & ramdisk_sectors
+    46 0000004A FF36[B901]              push word [kernel_sectors]
+    47 0000004E FF36[BB01]              push word [ramdisk_sectors]
+    48 00000052 E8(007E)                call (STAGE2_SEGMENT << 4)
+    49                                  
+    50 00000055 EBFE                    jmp $
+    51                                  
+    52                                  %if 0
+    53                                  puts: 
+    54                                      push bp
+    55                                      mov bp, sp
+    56                                      mov si, word [bp+4]
+    57                                  
+    58                                      puts_loop:
+    59                                          mov al, byte [si]
+    60                                          inc si
+    61                                          cmp al, 0
+    62                                          je puts_done
+    63                                          mov ah, 0x0e
+    64                                          int 0x10
+    65                                          jmp puts_loop
+    66                                  
+    67                                      puts_done:
+    68                                          pop bp
+    69                                          ret 0x2
+    70                                  %endif
+    71                                  
+    72                                  print_int:
+    73 00000057 55                          push bp
+    74 00000058 89E5                        mov bp, sp
+    75 0000005A 8B4604                      mov ax, word [bp+4]
+    76 0000005D 31D2                        xor dx, dx
+    77 0000005F B90010                      mov cx, 0x1000
+    78 00000062 BB[DF01]                    mov bx, charset
+    79                                  
+    80                                      print_int_loop:
+    81 00000065 F7F1                            div cx
+    82 00000067 B40E                            mov ah, 0x0e
+    83 00000069 D7                              xlat
+    84 0000006A CD10                            int 0x10
+    85 0000006C 89D0                            mov ax, dx
+    86 0000006E 31D2                            xor dx, dx
+    87 00000070 C1E904                          shr cx, 4
+    88 00000073 83F900                          cmp cx, 0
+    89 00000076 75ED                            jne print_int_loop
+    90                                  
+    91 00000078 5D                          pop bp
+    92 00000079 C20200                      ret 0x2
+    93                                  
     94                                  
-    95                                  
-    96                                  ; Reads a sector from the disk in CHS form
-    97                                  ; BP+4 = # of sectors to read
-    98                                  ; BP+6 = Cylinder # and Sector #
-    99                                  ; BP+8 = Head #
-   100                                  ; BP+A = Segment to load into
-   101                                  ; BP+C = Offset to load into
-   102                                  loadsector:
-   103 00000083 55                          push bp
-   104 00000084 89E5                        mov bp, sp
-   105                                  
-   106 00000086 8A4604                      mov al, byte [bp+0x4] ; # of sectors
-   107 00000089 8B4E06                      mov cx, word [bp+0x6] ; cylinder # in ch, sector # in cl
-   108 0000008C 8A7608                      mov dh, byte [bp+0x8] ; head #
-   109 0000008F 8B5E0A                      mov bx, word [bp+0xa] ; segment portion of address to load into
-   110 00000092 8EC3                        mov es, bx
-   111 00000094 8B5E0C                      mov bx, word [bp+0xc] ; offset portion of address to load into
-   112 00000097 B402                        mov ah, 2 ; read sectors operation
-   113 00000099 8A16[C801]                  mov dl, byte [disk_num]
-   114 0000009D CD13                        int 0x13
-   115                                  
-   116 0000009F 5D                          pop bp
-   117 000000A0 C20A00                      ret 0xa
-   118                                  
-   119                                  ; BP+4 = Linear Block Address
-   120                                  ; BP+6 = # of sectors to read
-   121                                  ; BP+8 = Segment to load into
-   122                                  ; BP+A = Offset to load into
-   123                                  loadsectors_lba:
-   124 000000A3 55                          push bp
-   125 000000A4 89E5                        mov bp, sp
-   126                                  
-   127 000000A6 8B4E06                      mov cx, word [bp+6]
-   128                                  
-   129                                      loadsectors_loop:
-   130 000000A9 51                              push cx
-   131 000000AA FF760A                          push word [bp+0xa]
-   132 000000AD FF7608                          push word [bp+0x8]
-   133 000000B0 6A01                            push 0x01
-   134 000000B2 FF7604                          push word [bp+0x4]
-   135 000000B5 E80E00                          call loadsector_lba
-   136 000000B8 59                              pop cx
-   137 000000B9 FF4604                          inc word [bp+4]
-   138 000000BC 83460820                        add word [bp+8], 0x20
-   139 000000C0 E2E7                            loop loadsectors_loop
-   140                                  
-   141 000000C2 5D                          pop bp
-   142 000000C3 C20800                      ret 0x8
-   143                                  
-   144                                  ; Takes an LBA address off the stack, converts it to CHS, then loads it
-   145                                  ; BP+4 = Linear Block Address
-   146                                  ; BP+6 = # of sectors to read
-   147                                  ; BP+8 = Segment to load into
-   148                                  ; BP+A = Offset to load into
-   149                                  loadsector_lba:
-   150 000000C6 55                          push bp
-   151 000000C7 89E5                        mov bp, sp
-   152                                  
-   153 000000C9 8B4604                      mov ax, word [bp+0x4]
-   154 000000CC 31D2                        xor dx, dx
-   155 000000CE F736[C901]                  div word [sectors_per_track] ; quotient(AX) = temp value, rem(DX)=sector-1
-   156 000000D2 89D3                        mov bx, dx ; moving sector #-1 into bx
-   157 000000D4 43                          inc bx
-   158 000000D5 31D2                        xor dx, dx
-   159                                  
-   160 000000D7 F736[CB01]                  div word [num_heads] ;quotient(AX) = cylinder #, rem(DX) = head #
-   161                                  
-   162 000000DB 88D9                        mov cl, bl ; sector #
-   163 000000DD 88C5                        mov ch, al ; cylinder #
-   164                                  
-   165 000000DF FF760A                      push word [bp+0xa] ; push offset to load into
-   166 000000E2 FF7608                      push word [bp+0x8] ; push segment to load into
-   167 000000E5 52                          push dx ; push head # onto the stack
-   168 000000E6 51                          push cx ; push cylinder # & sector #
-   169 000000E7 FF7606                      push word [bp+0x6] ; push # of sectors to read
-   170                                  
-   171 000000EA E896FF                      call loadsector
-   172                                  
-   173                                  %if 1
-   174 000000ED FF7604                      push word [bp+4]
-   175 000000F0 E86BFF                      call print_int
-   176                                  
-   177 000000F3 B020                        mov al, ' '
-   178 000000F5 B40E                        mov ah, 0x0e
-   179 000000F7 CD10                        int 0x10
-   180                                  
-   181 000000F9 FF7606                      push word [bp+6]
-   182 000000FC E85FFF                      call print_int
-   183                                  
-   184 000000FF B020                        mov al, ' '
-   185 00000101 B40E                        mov ah, 0x0e
-   186 00000103 CD10                        int 0x10
-   187                                  
-   188 00000105 FF7608                      push word [bp+8]
-   189 00000108 E853FF                      call print_int
-   190                                  
-   191 0000010B B03A                        mov al, ':'
-   192 0000010D B40E                        mov ah, 0x0e
-   193 0000010F CD10                        int 0x10
-   194                                  
-   195 00000111 FF760A                      push word [bp+0xa]
-   196 00000114 E847FF                      call print_int
-   197                                  
-   198 00000117 B00A                        mov al, 0x0a
-   199 00000119 B40E                        mov ah, 0x0e
-   200 0000011B CD10                        int 0x10
-   201 0000011D B00D                        mov al, 0x0d
-   202 0000011F B40E                        mov ah, 0x0e
-   203 00000121 CD10                        int 0x10
-   204                                  
-   205                                  %endif
-   206                                  
-   207 00000123 5D                          pop bp
-   208 00000124 C20800                      ret 0x8
-   209                                  
-   210                                  ; This function reads the currently-loaded disk fragment from TEMP_SEGMENT:0
-   211                                  ; If called correctly, it's the header of a USTAR file
-   212                                  ; Returns size (in sectors) in BX
-   213                                  ; The data is located at ES:007C and is 12 bytes long
-   214                                  get_size:
-   215 00000127 680030                      push TEMP_SEGMENT
-   216 0000012A 07                          pop es
-   217 0000012B B10B                        mov cl, 11
-   218 0000012D BF7C00                  	mov di, 0x7C
-   219 00000130 31DB                    	xor bx, bx
-   220 00000132 31D2                    	xor dx, dx
-   221                                  
-   222                                  	get_size_loop:
-   223 00000134 C1E303                          shl bx, 3
-   224 00000137 268A15                  		mov dl, BYTE [es:di]
-   225 0000013A 80EA30                  		sub dl, 48
-   226 0000013D 01D3                    		add bx, dx
-   227 0000013F 47                      		inc di
-   228 00000140 FEC9                    		dec cl
-   229 00000142 80F900                  		cmp cl, 0
-   230 00000145 75ED                    		jne get_size_loop
-   231                                  
-   232                                  	get_size_done:
-   233 00000147 89D9                            mov cx, bx
-   234 00000149 81E1FF01                		and cx, 0x1FF
-   235 0000014D C1EB09                  		shr bx, 9
-   236 00000150 83F900                  		cmp cx, 0
-   237 00000153 7401                    		je get_size_exit
-   238                                  	get_size_add_one:
-   239 00000155 43                      		inc bx
-   240                                  
-   241                                  	get_size_exit:
-   242 00000156 C3                      		ret
-   243                                  
-   244                                  ; Scans the disk (starting from sector 1 to find the file) to seek for the file with the name pointed to by si
-   245                                  ; Return values
-   246                                  ; AX = Sector #
-   247                                  ; BX = # of sectors
-   248                                  find_file: 
-   249 00000157 B80100                      mov ax, 0x01
-   250                                  
-   251                                      find_file_loop:
-   252                                          ; read a sector
-   253 0000015A 50                              push ax ; preserve current sector
-   254 0000015B 6A00                            push 0x0000
-   255 0000015D 680030                          push TEMP_SEGMENT
-   256 00000160 6A01                            push 0x01 ; only reading 1 sector
-   257 00000162 50                              push ax ; block #
-   258 00000163 E83DFF                          call loadsectors_lba
-   259                                  
-   260 00000166 58                              pop ax ; get the current sector back
-   261                                  
-   262                                          ; determine file size
-   263 00000167 E8BDFF                          call get_size
-   264                                  
-   265 0000016A 56                              push si
-   266 0000016B 680030                          push TEMP_SEGMENT
-   267 0000016E 07                              pop es
-   268 0000016F 31FF                            xor di, di
-   269                                  
-   270                                          find_file_strcmp_loop:
-   271 00000171 3E8A0C                              mov cl, byte [ds:si]
-   272 00000174 268A15                              mov dl, byte [es:di]
-   273 00000177 80F900                              cmp cl, 0
-   274 0000017A 7406                                je find_file_strcmp_loop_done
-   275 0000017C 47                                  inc di
-   276 0000017D 46                                  inc si
-   277 0000017E 38D1                                cmp cl, dl
-   278 00000180 74EF                                je find_file_strcmp_loop
-   279                                          
-   280                                          find_file_strcmp_loop_done:
-   281 00000182 28D1                                sub cl, dl
-   282                                  
-   283                                          ; compare the filename to what we're seeking for
-   284 00000184 5E                              pop si
-   285                                  
-   286 00000185 7405                            je find_file_exit
-   287                                  
-   288 00000187 01D8                            add ax, bx
-   289 00000189 40                              inc ax
-   290 0000018A EBCE                            jmp find_file_loop
-   291                                      
-   292                                      find_file_exit:
-   293 0000018C 40                              inc ax
-   294 0000018D C3                              ret
-   295                                  
-   296 0000018E C3                          ret
-   297                                  
-   298                                  ; Provide file in SI, and push offset then segment
-   299                                  load_file:
-   300 0000018F 55                          push bp
-   301 00000190 89E5                        mov bp, sp
-   302                                  
-   303 00000192 E8C2FF                      call find_file
-   304                                  
-   305                                  %if 1
-   306 00000195 50                          push ax
-   307 00000196 53                          push bx
-   308                                  
-   309 00000197 50                          push ax
-   310 00000198 E8C3FE                      call print_int
-   311                                  
-   312 0000019B B40E                        mov ah, 0x0e
-   313 0000019D B020                        mov al, 0x20
-   314 0000019F CD10                        int 0x10
-   315                                  
-   316 000001A1 56                          push si
-   317 000001A2 E8A2FE                      call puts
-   318                                  
-   319 000001A5 B40E                        mov ah, 0x0e
-   320 000001A7 B00A                        mov al, 0x0a
-   321 000001A9 CD10                        int 0x10
-   322                                  
-   323 000001AB B40E                        mov ah, 0x0e
-   324 000001AD B00D                        mov al, 0x0d
-   325 000001AF CD10                        int 0x10
-   326                                  
-   327 000001B1 5B                          pop bx
-   328 000001B2 58                          pop ax
-   329                                  %endif
-   330                                  
-   331 000001B3 53                          push bx
-   332                                  
-   333 000001B4 FF7606                      push word [bp+6]
-   334 000001B7 FF7604                      push word [bp+4]
-   335 000001BA 53                          push bx
-   336 000001BB 50                          push ax
-   337 000001BC E8E4FE                      call loadsectors_lba
-   338                                  
-   339 000001BF 58                          pop ax
-   340                                  
-   341 000001C0 5D                          pop bp
-   342 000001C1 C20400                      ret 0x4
-   343                                  
-   344 000001C4 0000                    kernel_sectors: dw 0
-   345 000001C6 0000                    ramdisk_sectors: dw 0
-   346                                  
-   347 000001C8 00                      disk_num: db 0
-   348 000001C9 0000                    sectors_per_track: dw 0
-   349 000001CB 0000                    num_heads: dw 0
-   350                                  
-   351                                  ;welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
-   352                                  
-   353 000001CD 6B65726E656C2E6269-     kernel_name: db "kernel.bin", 0
-   353 000001D6 6E00               
-   354                                  ;ramdisk_name: db "ramdisk.tar", 0
-   355 000001D8 7374616765322E6269-     stage2_name: db "stage2.bin", 0
-   355 000001E1 6E00               
-   356                                  
-   357 000001E3 303132333435363738-     charset: db "0123456789ABCDEF"
-   357 000001EC 39414243444546     
-   358                                  
-   359 000001F3 00<rep Bh>              times 510-($-$$) db 0
-   360 000001FE 55AA                    db 0x55, 0xaa
-   361                                  
-   362                                  KERNEL_SEGMENT equ 0x1000
-   363                                  STAGE2_SEGMENT equ 0x07E0
-   364                                  RAMDISK_SEGMENT equ 0x2000
-   365                                  TEMP_SEGMENT equ 0x3000
+    95                                  ; Reads a sector from the disk in CHS form
+    96                                  ; BP+4 = # of sectors to read
+    97                                  ; BP+6 = Cylinder # and Sector #
+    98                                  ; BP+8 = Head #
+    99                                  ; BP+A = Segment to load into
+   100                                  ; BP+C = Offset to load into
+   101                                  loadsector:
+   102 0000007C 55                          push bp
+   103 0000007D 89E5                        mov bp, sp
+   104                                  
+   105 0000007F 8A4604                      mov al, byte [bp+0x4] ; # of sectors
+   106 00000082 8B4E06                      mov cx, word [bp+0x6] ; cylinder # in ch, sector # in cl
+   107 00000085 8A7608                      mov dh, byte [bp+0x8] ; head #
+   108 00000088 8B5E0A                      mov bx, word [bp+0xa] ; segment portion of address to load into
+   109 0000008B 8EC3                        mov es, bx
+   110 0000008D 8B5E0C                      mov bx, word [bp+0xc] ; offset portion of address to load into
+   111 00000090 B402                        mov ah, 2 ; read sectors operation
+   112 00000092 8A16[BD01]                  mov dl, byte [disk_num]
+   113 00000096 CD13                        int 0x13
+   114                                  
+   115 00000098 5D                          pop bp
+   116 00000099 C20A00                      ret 0xa
+   117                                  
+   118                                  ; BP+4 = Linear Block Address
+   119                                  ; BP+6 = # of sectors to read
+   120                                  ; BP+8 = Segment to load into
+   121                                  ; BP+A = Offset to load into
+   122                                  loadsectors_lba:
+   123 0000009C 55                          push bp
+   124 0000009D 89E5                        mov bp, sp
+   125                                  
+   126 0000009F 8B4E06                      mov cx, word [bp+6]
+   127                                  
+   128                                      loadsectors_loop:
+   129 000000A2 51                              push cx
+   130 000000A3 FF760A                          push word [bp+0xa]
+   131 000000A6 FF7608                          push word [bp+0x8]
+   132 000000A9 6A01                            push 0x01
+   133 000000AB FF7604                          push word [bp+0x4]
+   134 000000AE E80E00                          call loadsector_lba
+   135 000000B1 59                              pop cx
+   136 000000B2 FF4604                          inc word [bp+4]
+   137 000000B5 83460820                        add word [bp+8], 0x20
+   138 000000B9 E2E7                            loop loadsectors_loop
+   139                                  
+   140 000000BB 5D                          pop bp
+   141 000000BC C20800                      ret 0x8
+   142                                  
+   143                                  ; Takes an LBA address off the stack, converts it to CHS, then loads it
+   144                                  ; BP+4 = Linear Block Address
+   145                                  ; BP+6 = # of sectors to read
+   146                                  ; BP+8 = Segment to load into
+   147                                  ; BP+A = Offset to load into
+   148                                  loadsector_lba:
+   149 000000BF 55                          push bp
+   150 000000C0 89E5                        mov bp, sp
+   151                                  
+   152 000000C2 8B4604                      mov ax, word [bp+0x4]
+   153 000000C5 31D2                        xor dx, dx
+   154 000000C7 F736[BE01]                  div word [sectors_per_track] ; quotient(AX) = temp value, rem(DX)=sector-1
+   155 000000CB 89D3                        mov bx, dx ; moving sector #-1 into bx
+   156 000000CD 43                          inc bx
+   157 000000CE 31D2                        xor dx, dx
+   158                                  
+   159 000000D0 F736[C001]                  div word [num_heads] ;quotient(AX) = cylinder #, rem(DX) = head #
+   160                                  
+   161 000000D4 88D9                        mov cl, bl ; sector #
+   162 000000D6 88C5                        mov ch, al ; cylinder #
+   163                                  
+   164 000000D8 FF760A                      push word [bp+0xa] ; push offset to load into
+   165 000000DB FF7608                      push word [bp+0x8] ; push segment to load into
+   166 000000DE 52                          push dx ; push head # onto the stack
+   167 000000DF 51                          push cx ; push cylinder # & sector #
+   168 000000E0 FF7606                      push word [bp+0x6] ; push # of sectors to read
+   169                                  
+   170 000000E3 E896FF                      call loadsector
+   171                                  
+   172                                  %if 1
+   173 000000E6 FF7604                      push word [bp+4]
+   174 000000E9 E86BFF                      call print_int
+   175                                  
+   176 000000EC B020                        mov al, ' '
+   177 000000EE B40E                        mov ah, 0x0e
+   178 000000F0 CD10                        int 0x10
+   179                                  
+   180 000000F2 FF7606                      push word [bp+6]
+   181 000000F5 E85FFF                      call print_int
+   182                                  
+   183 000000F8 B020                        mov al, ' '
+   184 000000FA B40E                        mov ah, 0x0e
+   185 000000FC CD10                        int 0x10
+   186                                  
+   187 000000FE FF7608                      push word [bp+8]
+   188 00000101 E853FF                      call print_int
+   189                                  
+   190 00000104 B03A                        mov al, ':'
+   191 00000106 B40E                        mov ah, 0x0e
+   192 00000108 CD10                        int 0x10
+   193                                  
+   194 0000010A FF760A                      push word [bp+0xa]
+   195 0000010D E847FF                      call print_int
+   196                                  
+   197 00000110 B00A                        mov al, 0x0a
+   198 00000112 B40E                        mov ah, 0x0e
+   199 00000114 CD10                        int 0x10
+   200 00000116 B00D                        mov al, 0x0d
+   201 00000118 B40E                        mov ah, 0x0e
+   202 0000011A CD10                        int 0x10
+   203                                  
+   204                                  %endif
+   205                                  
+   206 0000011C 5D                          pop bp
+   207 0000011D C20800                      ret 0x8
+   208                                  
+   209                                  ; This function reads the currently-loaded disk fragment from TEMP_SEGMENT:0
+   210                                  ; If called correctly, it's the header of a USTAR file
+   211                                  ; Returns size (in sectors) in BX
+   212                                  ; The data is located at ES:007C and is 12 bytes long
+   213                                  get_size:
+   214 00000120 680060                      push TEMP_SEGMENT
+   215 00000123 07                          pop es
+   216 00000124 B10B                        mov cl, 11
+   217 00000126 BF7C00                  	mov di, 0x7C
+   218 00000129 31DB                    	xor bx, bx
+   219 0000012B 31D2                    	xor dx, dx
+   220                                  
+   221                                  	get_size_loop:
+   222 0000012D C1E303                          shl bx, 3
+   223 00000130 268A15                  		mov dl, BYTE [es:di]
+   224 00000133 80EA30                  		sub dl, 48
+   225 00000136 01D3                    		add bx, dx
+   226 00000138 47                      		inc di
+   227 00000139 FEC9                    		dec cl
+   228 0000013B 80F900                  		cmp cl, 0
+   229 0000013E 75ED                    		jne get_size_loop
+   230                                  
+   231                                  	get_size_done:
+   232 00000140 89D9                            mov cx, bx
+   233 00000142 81E1FF01                		and cx, 0x1FF
+   234 00000146 C1EB09                  		shr bx, 9
+   235 00000149 83F900                  		cmp cx, 0
+   236 0000014C 7401                    		je get_size_exit
+   237                                  	get_size_add_one:
+   238 0000014E 43                      		inc bx
+   239                                  
+   240                                  	get_size_exit:
+   241 0000014F C3                      		ret
+   242                                  
+   243                                  ; Scans the disk (starting from sector 1 to find the file) to seek for the file with the name pointed to by si
+   244                                  ; Return values
+   245                                  ; AX = Sector #
+   246                                  ; BX = # of sectors
+   247                                  find_file: 
+   248 00000150 B80100                      mov ax, 0x01
+   249                                  
+   250                                      find_file_loop:
+   251                                          ; read a sector
+   252 00000153 50                              push ax ; preserve current sector
+   253 00000154 6A00                            push 0x0000
+   254 00000156 680060                          push TEMP_SEGMENT
+   255 00000159 6A01                            push 0x01 ; only reading 1 sector
+   256 0000015B 50                              push ax ; block #
+   257 0000015C E83DFF                          call loadsectors_lba
+   258                                  
+   259 0000015F 58                              pop ax ; get the current sector back
+   260                                  
+   261                                          ; determine file size
+   262 00000160 E8BDFF                          call get_size
+   263                                  
+   264 00000163 56                              push si
+   265 00000164 680060                          push TEMP_SEGMENT
+   266 00000167 07                              pop es
+   267 00000168 31FF                            xor di, di
+   268                                  
+   269                                          find_file_strcmp_loop:
+   270 0000016A 3E8A0C                              mov cl, byte [ds:si]
+   271 0000016D 268A15                              mov dl, byte [es:di]
+   272 00000170 80F900                              cmp cl, 0
+   273 00000173 7406                                je find_file_strcmp_loop_done
+   274 00000175 47                                  inc di
+   275 00000176 46                                  inc si
+   276 00000177 38D1                                cmp cl, dl
+   277 00000179 74EF                                je find_file_strcmp_loop
+   278                                          
+   279                                          find_file_strcmp_loop_done:
+   280 0000017B 28D1                                sub cl, dl
+   281                                  
+   282                                          ; compare the filename to what we're seeking for
+   283 0000017D 5E                              pop si
+   284                                  
+   285 0000017E 7405                            je find_file_exit
+   286                                  
+   287 00000180 01D8                            add ax, bx
+   288 00000182 40                              inc ax
+   289 00000183 EBCE                            jmp find_file_loop
+   290                                      
+   291                                      find_file_exit:
+   292 00000185 40                              inc ax
+   293 00000186 C3                              ret
+   294                                  
+   295 00000187 C3                          ret
+   296                                  
+   297                                  ; Provide file in SI, and push offset then segment
+   298                                  load_file:
+   299 00000188 55                          push bp
+   300 00000189 89E5                        mov bp, sp
+   301                                  
+   302 0000018B E8C2FF                      call find_file
+   303                                  
+   304                                  %if 1
+   305 0000018E 50                          push ax
+   306 0000018F 53                          push bx
+   307                                  
+   308 00000190 50                          push ax
+   309 00000191 E8C3FE                      call print_int
+   310                                  
+   311 00000194 B40E                        mov ah, 0x0e
+   312 00000196 B020                        mov al, 0x20
+   313 00000198 CD10                        int 0x10
+   314                                  
+   315                                      ;push si
+   316                                      ;call puts
+   317                                  
+   318 0000019A B40E                        mov ah, 0x0e
+   319 0000019C B00A                        mov al, 0x0a
+   320 0000019E CD10                        int 0x10
+   321                                  
+   322 000001A0 B40E                        mov ah, 0x0e
+   323 000001A2 B00D                        mov al, 0x0d
+   324 000001A4 CD10                        int 0x10
+   325                                  
+   326 000001A6 5B                          pop bx
+   327 000001A7 58                          pop ax
+   328                                  %endif
+   329                                  
+   330 000001A8 53                          push bx
+   331                                  
+   332 000001A9 FF7606                      push word [bp+6]
+   333 000001AC FF7604                      push word [bp+4]
+   334 000001AF 53                          push bx
+   335 000001B0 50                          push ax
+   336 000001B1 E8E8FE                      call loadsectors_lba
+   337                                  
+   338 000001B4 58                          pop ax
+   339                                  
+   340 000001B5 5D                          pop bp
+   341 000001B6 C20400                      ret 0x4
+   342                                  
+   343 000001B9 0000                    kernel_sectors: dw 0
+   344 000001BB 0000                    ramdisk_sectors: dw 0
+   345                                  
+   346 000001BD 00                      disk_num: db 0
+   347 000001BE 0000                    sectors_per_track: dw 0
+   348 000001C0 0000                    num_heads: dw 0
+   349                                  
+   350                                  ;welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
+   351                                  
+   352 000001C2 6B65726E656C2E6269-     kernel_name: db "kernel.bin", 0
+   352 000001CB 6E00               
+   353 000001CD 696E6974726400          ramdisk_name: db "initrd", 0
+   354 000001D4 7374616765322E6269-     stage2_name: db "stage2.bin", 0
+   354 000001DD 6E00               
+   355                                  
+   356 000001DF 303132333435363738-     charset: db "0123456789ABCDEF"
+   356 000001E8 39414243444546     
+   357                                  
+   358 000001EF 00<rep Fh>              times 510-($-$$) db 0
+   359 000001FE 55AA                    db 0x55, 0xaa
+   360                                  
+   361                                  KERNEL_SEGMENT equ 0x1000
+   362                                  STAGE2_SEGMENT equ 0x07E0
+   363                                  RAMDISK_SEGMENT equ 0x4000
+   364                                  TEMP_SEGMENT equ 0x6000

@@ -1,6 +1,14 @@
 [org 0x7e00]
 [bits 16]
 
+push bp
+mov bp, sp
+
+mov bx, word [bp+4] ; ramdisk_sectors
+mov word [ramdisk_sectors], bx
+mov bx, word [bp+6] ; kernel_sectors
+mov word [kernel_sectors], bx
+
 push welcome_msg
 call puts
 
@@ -361,7 +369,7 @@ mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
 
 charset: db "0123456789ABCDEF"
 
-kernel_sectors: dw 0
+kernel_sectors: dw 0xBEEF
 ramdisk_sectors: dw 0xDEAD
 mem_size: dw 0xBEEF
 dw 0

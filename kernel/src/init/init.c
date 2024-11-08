@@ -18,6 +18,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <thread/thread.h>
+#include <basedrv/ramdisk.h>
+#include <ios/blockdev.h>
+#include <ios/buf.h>
 
 typedef struct kernel_startup_params {
     uint16_t kernel_sectors;
@@ -50,6 +53,9 @@ uint32_t thread_fun_3(void* param){
 void _start(kernel_startup_params_t* params){
     char buf[40];
 
+    char sector_buf[512];
+    buf_t* b;
+
     dbg_printf = params->printf;
     
     pmm_init();
@@ -72,6 +78,18 @@ void _start(kernel_startup_params_t* params){
 	io_write_8(0x40, 0x4);
 
     tty_init();
+
+    binit();
+
+    int n_ramdisk = install_ramdisk(0x40000, params->ramdisk_sectors);
+    //block_devs[n_ramdisk].read(&(block_devs[n_ramdisk]), sector_buf, 0);
+
+    dbg_printf("Loaded ramdisk at index %x\n", n_ramdisk);
+    b = bread(n_ramdisk, 0);
+    dbg_printf("%s\n", b->data);
+    //dbg_printf("%s\n", sector_buf);
+
+    while(1);
 
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);

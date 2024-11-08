@@ -8,11 +8,6 @@
 jmp 0:go
 
 go:
-
-;mov ax, cs
-;mov ds, ax
-;mov ss, ax
-;xor ax, ax
 xor ax, ax
 mov ds, ax
 mov ss, ax
@@ -26,9 +21,6 @@ inc dh
 mov [num_heads], dh
 and cl, 0x3f
 mov [sectors_per_track], cl
-
-;push welcome_msg
-;call puts
 
 ; load stage2.bin
 mov si, stage2_name
@@ -44,14 +36,20 @@ call load_file
 mov word [kernel_sectors], ax
 
 ; load the ramdisk
+mov si, ramdisk_name
+push 0x0000
+push RAMDISK_SEGMENT
+call load_file
+mov word [ramdisk_sectors], ax
 
 ; push kernel_sectors & ramdisk_sectors
-push kernel_sectors
-push ramdisk_sectors
-jmp (STAGE2_SEGMENT << 4)
+push word [kernel_sectors]
+push word [ramdisk_sectors]
+call (STAGE2_SEGMENT << 4)
 
 jmp $
 
+%if 0
 puts: 
     push bp
     mov bp, sp
@@ -69,6 +67,7 @@ puts:
     puts_done:
         pop bp
         ret 0x2
+%endif
 
 print_int:
     push bp
@@ -313,8 +312,8 @@ load_file:
     mov al, 0x20
     int 0x10
 
-    push si
-    call puts
+    ;push si
+    ;call puts
 
     mov ah, 0x0e
     mov al, 0x0a
@@ -351,7 +350,7 @@ num_heads: dw 0
 ;welcome_msg: db "BOOT1", 0x0a, 0x0d, 0
 
 kernel_name: db "kernel.bin", 0
-;ramdisk_name: db "ramdisk.tar", 0
+ramdisk_name: db "initrd", 0
 stage2_name: db "stage2.bin", 0
 
 charset: db "0123456789ABCDEF"
@@ -361,5 +360,5 @@ db 0x55, 0xaa
 
 KERNEL_SEGMENT equ 0x1000
 STAGE2_SEGMENT equ 0x07E0
-RAMDISK_SEGMENT equ 0x2000
-TEMP_SEGMENT equ 0x3000
+RAMDISK_SEGMENT equ 0x4000
+TEMP_SEGMENT equ 0x6000
