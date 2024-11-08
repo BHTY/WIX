@@ -5,7 +5,9 @@
 4. Blocking
 
 # Bug fixes
-The kernel heap seems buggy...
+- The kernel heap seems buggy...
+- On the crash screen, before printing a stack trace or disassembly, check that the addresses are accessible!!!
+- Not a bug, but the PMM and VMM need more stuff (like setting page permissions)
 
 # Multithreading
 - Add thread-local-storage (Win32-like mechanism; FS register points to a TEB)
