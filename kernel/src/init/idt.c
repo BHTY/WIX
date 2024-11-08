@@ -42,7 +42,7 @@ void trace(int_state_t* state){
 }
 
 void crash_dump(char* buf, int_state_t* state){
-    sprintf(buf, "EAX: 0x%08X\nECX: 0x%08X\nEDX: 0x%08X\nEBX: 0x%08X\nEBP: 0x%08X\nESP: 0x%08X\nESI: 0x%08X\nEDI: 0x%08X\n\n", state->eax, state->ecx, state->edx, state->ebx, state->ebp, state->esp, state->esi, state->edi);
+    sprintf(buf, "EAX: 0x%08X  ECX: 0x%08X  EDX: 0x%08X  EBX: 0x%08X\nEBP: 0x%08X  ESP: 0x%08X  ESI: 0x%08X  EDI: 0x%08X\n\n", state->eax, state->ecx, state->edx, state->ebx, state->ebp, state->esp, state->esi, state->edi);
     tty_write(buf, strlen(buf));
     
     //stack dump
@@ -53,7 +53,8 @@ void crash_dump(char* buf, int_state_t* state){
 }
 
 void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, uint32_t eip){
-    char buf[80];
+    char buf[256];
+    int print_instructions = 1;
 
     disable_interrupts();
 
@@ -73,6 +74,9 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
 
             sprintf(buf, "PAGE FAULT ACCESSING 0x%08x\n", vaddr);
             tty_write(buf, strlen(buf));
+
+            if(vaddr == eip) print_instructions = 0;
+
             break;
         }
         case 0x20:{
@@ -85,6 +89,15 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
 
     tty_write("\n", 1);
     crash_dump(buf, state);
+
+    if(print_instructions){
+        sprintf(buf, "\n%08x: ", eip);
+        tty_write(buf, strlen(buf));
+
+        disasm_opcode(buf, eip, eip, 1, 1, 0, 0, 0);
+
+        tty_write(buf, strlen(buf));
+    }
     
     while(1);
 }

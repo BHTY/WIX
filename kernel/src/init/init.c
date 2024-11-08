@@ -86,7 +86,7 @@ void _start(kernel_startup_params_t* params){
 
     fs_test(params, "test.txt");
 
-    while(1);
+    *(uint8_t*)(0)= 0 ;
 
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);
