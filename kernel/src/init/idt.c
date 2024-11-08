@@ -98,6 +98,8 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
 
         tty_write(buf, strlen(buf));
     }
+
+    dbg_printf("Hey bub... we crashed\n");
     
     while(1);
 }

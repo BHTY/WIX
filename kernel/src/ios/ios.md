@@ -43,6 +43,7 @@ Some file calls cannot be executed immediately. In that case, they will either b
 - tell
 - dup
 - ioctl
+
 A few system calls to deal with polling whether a device has data available may also be in order.
 
 Stuff for dealing with iterating over files in a directory, changing the current directory, etc.

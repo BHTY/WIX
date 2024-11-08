@@ -8,4 +8,4 @@ all:
 	cd disk; make
 
 clean:
-		rm -f -- $(shell find boot disk kernel -type f -name "*.o" -or -name "*.a" -or -name "*.bin")
+		rm -f -- $(shell find boot disk kernel -type f -name "*.o" -or -name "*.a" -or -name "*.bin" -or -name "*.lst")

@@ -5,4 +5,4 @@ all:
 		nasm -f bin -o build/stage2.bin src/stage2.s -l build/stage2.lst
 
 clean:
-		rm $(BUILDDIR)/*.bin
+		rm $(BUILDDIR)/*.bin $(BUILDDIR)/*.lst
