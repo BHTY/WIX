@@ -7,53 +7,37 @@
 #include <stdint.h>
 #include <string.h>
 #include <mm/pmm.h>
+#include <mm/bitarray.h>
 
 extern void (*dbg_printf)(const char*, ...);
 
-uint32_t pageframe_bitmap[120] = {0};
+struct {
+    size_t nbits;
+    size_t arr_size;
+    uint32_t arr[120];
+} pageframe_bitmap;
 
+/* Initializes the physical memory manager and pageframe bitmap */
 void pmm_init(){
-    memset(pageframe_bitmap, 0, sizeof(pageframe_bitmap));
+    pageframe_bitmap.nbits = 3840;
+    pageframe_bitmap.arr_size = 120;
+    memset(pageframe_bitmap.arr, 0, sizeof(uint32_t) * pageframe_bitmap.arr_size);
 }
 
-int bitscan(uint32_t bitfield){ //find first zero
-    int index = 0;
+/* Commit contiguous pages of physical memory */
+paddr_t commit_pages(size_t n){
+    pfn_t index = bitarray_find_free_region((struct bitarray*)&pageframe_bitmap, n);
 
-    while(bitfield){
-        if(!(bitfield & 0x1)) break;
-        bitfield >>= 1;
-
-        index++;
+    if (index != -1){
+        bitarray_set((struct bitarray*)&pageframe_bitmap, index, n);
+        return (index << 12) + 0x100000;
     }
 
-    return index;
+    return -1;
 }
 
-pfn_t commit_page(){
-    pfn_t pfn = -1 - 0x100;
-
-    for(int i = 0; i < 120; i++){
-        if(pageframe_bitmap[i] != 0xFFFFFFFF){
-            int bit_index = bitscan(pageframe_bitmap[i]);
-            pfn = bit_index + i * 32;
-            pageframe_bitmap[i] |= 1 << bit_index;
-            break;
-        }
-        /*if(!pageframe_bitmap[i]){
-            pfn = i;
-            pageframe_bitmap[i] = 1;
-            break;
-        }*/
-    }
-
-    dbg_printf("[PMM] Allocated page at %x\n", (pfn + 0x100) << 12);
-
-    return pfn + 0x100;
-}
-
-void decommit_page(pfn_t pfn){
-    int array_index = (pfn - 0x100) >> 5;
-    int bit_index = (pfn - 0x100) % 32;
-
-    pageframe_bitmap[array_index] &= ~(1 << bit_index);
+/* Decommit pages of physical memory */
+void decommit_pages(paddr_t paddr, size_t n){
+    pfn_t index = (paddr - 0x100000) >> 12;
+    bitarray_clear((struct bitarray*)&pageframe_bitmap, index, n);
 }

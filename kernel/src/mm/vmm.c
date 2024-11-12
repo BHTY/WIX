@@ -15,7 +15,7 @@ void map_page(pgdir_t* page_dir, paddr_t paddr, vaddr_t vaddr){
     uintptr_t pt_entry = (vaddr >> 12) & 0x3FF; // index into page table
 
     if (page_dir->entries[pd_entry] == 0){ // the virtual address is not backed by any existing page table
-        page_dir->entries[pd_entry] = (commit_page() << 12) | 7;
+        page_dir->entries[pd_entry] = (commit_pages(1)) | 7;
     }
 
     pgtable_t* page_table = (pgtable_t*)(page_dir->entries[pd_entry] & 0xFFFFF000);

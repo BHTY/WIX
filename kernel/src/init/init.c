@@ -65,6 +65,12 @@ void fs_test(kernel_startup_params_t* params, const char* filename){
     }
 }
 
+extern struct {
+    size_t nbits;
+    size_t arr_size;
+    uint32_t arr[120];
+} pageframe_bitmap;
+
 void _start(kernel_startup_params_t* params){
     char buf[40];
 
