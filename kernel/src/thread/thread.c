@@ -12,7 +12,7 @@
 #include <mm/vmm.h>
 #include <mm/heap.h>
 
-uint32_t interrupt_tick = 0;
+volatile uint32_t interrupt_tick = 0;
 
 task_t* cur_task;
 task_t base_task;
@@ -66,11 +66,11 @@ void create_thread(task_t* task, thread_func_t fn, void* param, int user_esp){
     stack--; *stack = 0;
     stack--; *stack = 0;
 
-    task->esp = (uint32_t)stack;
+    task->esp0 = (uint32_t)stack;
     task->cr3 = (pgdir_t*)0x30000;
 
     if (user_esp){
-        task->esp0 = (uint32_t)heap_alloc(4096) + 4096;
+        task->esp3 = (uint32_t)heap_alloc(4096) + 4096;
     }
 }
 

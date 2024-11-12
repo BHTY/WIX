@@ -12,7 +12,7 @@ void* sbrk(size_t increment){
 
     while(new_brk > brk_end){
         paddr_t new_page = commit_pages(1);
-        map_page((void*)0x30000, new_page, brk_end);
+        map_page((void*)0x30000, new_page, brk_end, 0x107);
 
         brk_end += 0x1000;
     }

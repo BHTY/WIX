@@ -9,15 +9,15 @@ typedef uint32_t tid_t;
 typedef uint32_t (*thread_func_t)(void*);
 
 typedef struct task{
-    uint32_t esp;
+    uint32_t esp0;
     struct task* next;
     struct task* prev;
-    uint32_t esp0;
+    uint32_t esp3;
     pgdir_t* cr3;
 } task_t;
 
 extern task_t* cur_task;
-extern uint32_t interrupt_tick;
+extern volatile uint32_t interrupt_tick;
 
 void task_switch(int_state_t* state);
 void init_tasking();

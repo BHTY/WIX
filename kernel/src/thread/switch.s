@@ -1,8 +1,8 @@
 struc TASK 
-  .esp:        resd    1 
+  .esp0:       resd    1 
   .next:       resd    1 
   .prev:       resd    1 
-  .esp0:       resd    1
+  .esp3:       resd    1
   .cr3:        resd    1
 endstruc
 
@@ -25,14 +25,14 @@ task_switch:
     push dword [edx+0x00] ; edi
 
     mov edi, [cur_task]
-    mov [edi+TASK.esp], esp
+    mov [edi+TASK.esp0], esp
 
     ; Load state of next task
     mov esi, [edi+TASK.next]
     mov [cur_task], esi
 
-    mov esp, [esi+TASK.esp]
-    mov ebx, [esi+TASK.esp0]
+    mov esp, [esi+TASK.esp0]
+    mov ebx, [esi+TASK.esp3]
     mov [tss_entry+4], ebx
 
     pop edi
@@ -110,7 +110,7 @@ jump_usermode:
 
 	; set up the stack frame iret expects
     mov eax, dword [cur_task]
-    mov eax, [eax+TASK.esp0] ; get the user mode stack
+    mov eax, [eax+TASK.esp3] ; get the user mode stack
     push ebx
 	push (4 * 8) | 3 ; data selector
 	push eax ; current esp
