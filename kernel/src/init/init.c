@@ -54,7 +54,7 @@ uint32_t thread_fun_3(void* param){
 
 void fs_test(kernel_startup_params_t* params, const char* filename){
     char buffer[512];
-    int n_ramdisk = install_ramdisk((uint8_t*)0x40000, params->ramdisk_sectors);
+    int n_ramdisk = install_ramdisk((uint8_t*)0x50000, params->ramdisk_sectors);
     tar_mount(n_ramdisk);
     inode_t* ip = tar_open(filename);
 

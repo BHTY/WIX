@@ -1,0 +1,410 @@
+     1                                  [org 0x7e00]
+     2                                  [bits 16]
+     3                                  
+     4 00000000 55                      push bp
+     5 00000001 89E5                    mov bp, sp
+     6                                  
+     7 00000003 8B5E04                  mov bx, word [bp+4] ; ramdisk_sectors
+     8 00000006 891E[3603]              mov word [ramdisk_sectors], bx
+     9 0000000A 8B5E06                  mov bx, word [bp+6] ; kernel_sectors
+    10 0000000D 891E[3403]              mov word [kernel_sectors], bx
+    11                                  
+    12 00000011 68[F002]                push welcome_msg
+    13 00000014 E84600                  call puts
+    14                                  
+    15 00000017 B488                    mov ah, 0x88
+    16 00000019 CD15                    int 0x15
+    17 0000001B A3[3803]                mov word [mem_size], ax
+    18                                  
+    19 0000001E 50                      push ax
+    20 0000001F E85200                  call print_int
+    21                                  
+    22 00000022 68[1503]                push mb_msg
+    23 00000025 E83500                  call puts
+    24                                  
+    25 00000028 FA                      cli
+    26 00000029 0F0116[5700]            lgdt [GDT_Descriptor]
+    27 0000002E 0F20C0                  mov eax, cr0
+    28 00000031 6683C801                or eax, 1
+    29 00000035 0F22C0                  mov cr0, eax
+    30                                  
+    31 00000038 EA[9900]0800            jmp CODE_SEG:start_protected_mode
+    32                                  
+    33 0000003D EBFE                    jmp $
+    34                                  
+    35                                  CODE_SEG equ kernel_code_descriptor - GDT_Start
+    36                                  DATA_SEG equ kernel_data_descriptor - GDT_Start
+    37                                  
+    38                                  GDT_Start:
+    39                                  	null_descriptor:
+    40 0000003F 00000000                		dd 0
+    41 00000043 00000000                		dd 0
+    42                                  	kernel_code_descriptor:
+    43 00000047 FFFF                    		dw 0xffff
+    44 00000049 0000                    		dw 0
+    45 0000004B 00                      		db 0
+    46 0000004C 9A                      		db 0x9a
+    47 0000004D CF                      		db 0xcf
+    48 0000004E 00                      		db 0
+    49                                  	kernel_data_descriptor:
+    50 0000004F FFFF                    		dw 0xffff
+    51 00000051 0000                    		dw 0
+    52 00000053 00                      		db 0
+    53 00000054 92                      		db 0x92
+    54 00000055 CF                      		db 0xcf
+    55 00000056 00                      		db 0
+    56                                  	GDT_End:
+    57                                  
+    58                                  GDT_Descriptor:
+    59 00000057 1700                    	dw GDT_End - GDT_Start - 1 ;size
+    60 00000059 [3F000000]              	dd GDT_Start ;start
+    61                                  
+    62                                  puts: 
+    63 0000005D 55                          push bp
+    64 0000005E 89E5                        mov bp, sp
+    65 00000060 8B7604                      mov si, word [bp+4]
+    66                                  
+    67                                      puts_loop:
+    68 00000063 8A04                            mov al, byte [si]
+    69 00000065 46                              inc si
+    70 00000066 3C00                            cmp al, 0
+    71 00000068 7406                            je puts_done
+    72 0000006A B40E                            mov ah, 0x0e
+    73 0000006C CD10                            int 0x10
+    74 0000006E EBF3                            jmp puts_loop
+    75                                  
+    76                                      puts_done:
+    77 00000070 5D                              pop bp
+    78 00000071 C20200                          ret 0x2
+    79                                  
+    80                                  print_int:
+    81 00000074 55                          push bp
+    82 00000075 89E5                        mov bp, sp
+    83 00000077 8B4604                      mov ax, word [bp+4]
+    84 0000007A 31D2                        xor dx, dx
+    85 0000007C B90010                      mov cx, 0x1000
+    86 0000007F BB[2403]                    mov bx, charset
+    87                                  
+    88                                      print_int_loop:
+    89 00000082 F7F1                            div cx
+    90 00000084 B40E                            mov ah, 0x0e
+    91 00000086 D7                              xlat
+    92 00000087 CD10                            int 0x10
+    93 00000089 89D0                            mov ax, dx
+    94 0000008B 31D2                            xor dx, dx
+    95 0000008D C1E904                          shr cx, 4
+    96 00000090 83F900                          cmp cx, 0
+    97 00000093 75ED                            jne print_int_loop
+    98                                  
+    99 00000095 5D                          pop bp
+   100 00000096 C20200                      ret 0x2
+   101                                  
+   102                                  [bits 32]
+   103                                  start_protected_mode:
+   104 00000099 66B81000                	mov ax, DATA_SEG
+   105 0000009D 8ED8                    	mov ds, ax
+   106 0000009F 8ED0                    	mov ss, ax
+   107 000000A1 8EC0                    	mov es, ax
+   108 000000A3 8EE0                    	mov fs, ax
+   109 000000A5 8EE8                    	mov gs, ax
+   110 000000A7 BD00000A00              	mov ebp, 0xA0000;0x7C00
+   111 000000AC 89EC                    	mov esp, ebp
+   112                                  
+   113 000000AE C60500800B0041              mov byte [0xb8000], 'A'
+   114                                  
+   115 000000B5 C70500000800071008-         mov dword [0x80000], 0x81007
+   115 000000BE 00                 
+   116 000000BF C70500080800072008-         mov dword [0x80800], 0x82007
+   116 000000C8 00                 
+   117                                  
+   118 000000C9 E85B000000                  call fill_pt
+   119                                  
+   120 000000CE E838000000                  call map_kernel
+   121                                  
+   122                                      ; enable paging
+   123 000000D3 B800000800                  mov eax, 0x80000
+   124 000000D8 0F22D8                      mov cr3, eax
+   125 000000DB 0F20C0                      mov eax, cr0
+   126 000000DE 0D01000080                  or eax, 0x80000001
+   127 000000E3 0F22C0                      mov cr0, eax
+   128                                  
+   129 000000E6 C60500800B0042              mov byte [0xb8000], 'B'
+   130                                  
+   131 000000ED 0FBF05[38030000]            movsx eax, word [mem_size]
+   132 000000F4 50                          push eax
+   133 000000F5 68[43010000]                push test_str
+   134 000000FA E89A000000                  call printf
+   135                                  
+   136 000000FF 68[34030000]                push kernel_sectors
+   137 00000104 E8(00000100)                call 0x10000
+   138                                  
+   139 00000109 EBFE                        jmp $
+   140                                  
+   141                                  map_kernel:
+   142 0000010B 31C0                        xor eax, eax
+   143                                  
+   144                                      map_kernel_loop:
+   145 0000010D 89C3                            mov ebx, eax
+   146 0000010F C1E30C                          shl ebx, 12
+   147 00000112 81C300000100                    add ebx, 0x10000
+   148 00000118 83CB07                          or ebx, 7
+   149 0000011B 891C8500200800                  mov [eax * 4 + 0x82000], ebx
+   150                                  
+   151 00000122 40                              inc eax
+   152 00000123 83F810                          cmp eax, 16
+   153 00000126 75E5                            jne map_kernel_loop
+   154                                  
+   155 00000128 C3                          ret
+   156                                  
+   157                                  fill_pt:
+   158 00000129 31C0                        xor eax, eax
+   159                                  
+   160                                      fill_pt_loop:
+   161 0000012B 89C3                            mov ebx, eax
+   162 0000012D C1E30C                          shl ebx, 12
+   163 00000130 83CB07                          or ebx, 7
+   164 00000133 891C8500100800                  mov [eax * 4 + 0x81000], ebx
+   165                                  
+   166 0000013A 40                              inc eax
+   167 0000013B 3D00010000                      cmp eax, 256
+   168 00000140 75E9                            jne fill_pt_loop
+   169                                      
+   170 00000142 C3                          ret
+   171                                  
+   172 00000143 48656C6C6F2066726F-     test_str: db "Hello from Protected Mode! %x KB Memory", 0x0a, 0
+   172 0000014C 6D2050726F74656374-
+   172 00000155 6564204D6F64652120-
+   172 0000015E 2578204B42204D656D-
+   172 00000167 6F72790A00         
+   173                                  
+   174                                  print_dec:
+   175                                  print_hex:
+   176 0000016C 55                          push ebp
+   177 0000016D 89E5                        mov ebp, esp
+   178 0000016F 8B4508                      mov eax, dword [ebp+0x8]
+   179 00000172 31D2                        xor edx, edx
+   180 00000174 B900000010                  mov ecx, 0x10000000
+   181 00000179 BB[24030000]                mov ebx, charset
+   182                                  
+   183                                      print_hex_loop:
+   184 0000017E F7F1                            div ecx
+   185 00000180 D7                              xlat
+   186 00000181 52                              push edx
+   187 00000182 50                              push eax
+   188 00000183 E8E9000000                      call putc
+   189 00000188 5A                              pop edx
+   190 00000189 89D0                            mov eax, edx
+   191 0000018B 31D2                            xor edx, edx
+   192 0000018D C1E904                          shr ecx, 4
+   193 00000190 83F900                          cmp ecx, 0
+   194 00000193 75E9                            jne print_hex_loop
+   195                                  
+   196 00000195 5D                          pop ebp
+   197 00000196 C20400                      ret 0x4
+   198                                  
+   199                                  printf: ; cdecl
+   200 00000199 55                          push ebp
+   201 0000019A 89E5                        mov ebp, esp
+   202 0000019C B901000000                  mov ecx, 1
+   203                                  
+   204                                      printf_loop:
+   205 000001A1 8B4508                          mov eax, dword [ebp+0x8]
+   206 000001A4 8A00                            mov al, byte [eax]
+   207 000001A6 FF4508                          inc dword [ebp+0x8]
+   208 000001A9 3C00                            cmp al, 0
+   209 000001AB 7448                            je printf_done
+   210 000001AD 3C25                            cmp al, '%'
+   211 000001AF 7408                            je printf_format
+   212 000001B1 50                              push eax
+   213 000001B2 E8BA000000                      call putc
+   214 000001B7 EBE8                            jmp printf_loop
+   215                                  
+   216                                          printf_format:
+   217 000001B9 8B4508                              mov eax, dword [ebp+0x8]
+   218 000001BC 8A00                                mov al, byte [eax]
+   219 000001BE 51                                  push ecx
+   220 000001BF FF748D08                            push dword [ebp+0x8+ecx*4]
+   221                                  
+   222 000001C3 3C63                                cmp al, 'c'
+   223 000001C5 7412                                je printf_char
+   224 000001C7 3C73                                cmp al, 's'
+   225 000001C9 7415                                je printf_str
+   226 000001CB 3C78                                cmp al, 'x'
+   227 000001CD 7418                                je printf_hex
+   228 000001CF 6A25                                push '%'
+   229 000001D1 E89B000000                          call putc
+   230 000001D6 59                                  pop ecx
+   231 000001D7 EBC8                                jmp printf_loop
+   232                                  
+   233                                              printf_char:
+   234 000001D9 E893000000                              call putc
+   235 000001DE EB0E                                    jmp printf_format_done
+   236                                  
+   237                                              printf_str:
+   238 000001E0 E871000000                              call puts32
+   239 000001E5 EB07                                    jmp printf_format_done
+   240                                  
+   241                                              printf_hex:
+   242 000001E7 E880FFFFFF                              call print_hex
+   243 000001EC EB00                                    jmp printf_format_done
+   244                                  
+   245                                              printf_format_done:
+   246 000001EE 59                                      pop ecx
+   247 000001EF 41                                      inc ecx
+   248 000001F0 FF4508                                  inc dword [ebp+0x8]
+   249                                          
+   250 000001F3 EBAC                            jmp printf_loop
+   251                                  
+   252                                      printf_done:
+   253 000001F5 5D                              pop ebp
+   254 000001F6 C3                              ret
+   255                                  
+   256                                  %macro outb 2
+   257                                      mov dx, %1
+   258                                      mov al, %2
+   259                                      out dx, al
+   260                                  %endmacro
+   261                                  
+   262                                  set_cursor:
+   263                                      outb 0x3d4, 14
+   257 000001F7 66BAD403            <1>  mov dx, %1
+   258 000001FB B00E                <1>  mov al, %2
+   259 000001FD EE                  <1>  out dx, al
+   264 000001FE A1[40030000]                mov eax, dword [vp_pos]
+   265 00000203 C1E808                      shr eax, 8
+   266                                      outb 0x3d5, al
+   257 00000206 66BAD503            <1>  mov dx, %1
+   258 0000020A 88C0                <1>  mov al, %2
+   259 0000020C EE                  <1>  out dx, al
+   267                                      outb 0x3d4, 15
+   257 0000020D 66BAD403            <1>  mov dx, %1
+   258 00000211 B00F                <1>  mov al, %2
+   259 00000213 EE                  <1>  out dx, al
+   268 00000214 A1[40030000]                mov eax, dword [vp_pos]
+   269                                      outb 0x3d5, al
+   257 00000219 66BAD503            <1>  mov dx, %1
+   258 0000021D 88C0                <1>  mov al, %2
+   259 0000021F EE                  <1>  out dx, al
+   270 00000220 C3                          ret
+   271                                  
+   272                                  scroll:
+   273 00000221 BB00000000                  mov ebx, 0
+   274                                      scroll_loop:
+   275 00000226 B8A0000000                      mov eax, ROWS*2
+   276 0000022B F7E3                            mul ebx
+   277 0000022D 0500800B00                      add eax, VIDEO_PTR
+   278                                  
+   279 00000232 89C7                            mov edi, eax
+   280 00000234 89FE                            mov esi, edi
+   281 00000236 81C6A0000000                    add esi, ROWS*2
+   282                                          
+   283 0000023C B928000000                      mov ecx, ROWS / 2
+   284 00000241 F3A5                            rep movsd
+   285 00000243 43                              inc ebx
+   286 00000244 83FB50                          cmp ebx, ROWS
+   287 00000247 7CDD                            jl scroll_loop
+   288                                  
+   289 00000249 B800000000                  mov eax, 0
+   290 0000024E BF008F0B00                  mov edi, VIDEO_PTR + (COLUMNS-1)*ROWS*2
+   291 00000253 F3AB                        rep stosd
+   292 00000255 C3                          ret
+   293                                  
+   294                                  puts32:
+   295 00000256 55                          push ebp
+   296 00000257 89E5                        mov ebp, esp
+   297                                  
+   298                                      puts32_loop:
+   299 00000259 8B7508                          mov esi, dword [ebp+0x8]
+   300 0000025C 8A06                            mov al, byte [esi]
+   301 0000025E 3C00                            cmp al, 0
+   302 00000260 740B                            je puts32_done
+   303 00000262 50                              push eax
+   304 00000263 E809000000                      call putc
+   305 00000268 FF4508                          inc dword [ebp+0x8]
+   306 0000026B EBEC                            jmp puts32_loop
+   307                                  
+   308                                      puts32_done:
+   309 0000026D 5D                          pop ebp
+   310 0000026E C20400                      ret 0x4
+   311                                  
+   312                                  putc:
+   313 00000271 55                          push ebp
+   314 00000272 89E5                        mov ebp, esp
+   315                                  
+   316 00000274 66BAFD03                    mov dx, SERIAL_PORT+5
+   317                                     
+   318                                      wait_transmit_empty:
+   319 00000278 EC                              in al, dx
+   320 00000279 A820                            test al, 0x20
+   321 0000027B 74FB                            je wait_transmit_empty
+   322                                  
+   323 0000027D 8A4508                      mov al, byte [ebp+0x8]
+   324 00000280 66BAF803                    mov dx, SERIAL_PORT
+   325 00000284 EE                          out dx, al
+   326                                  
+   327 00000285 5D                          pop ebp
+   328 00000286 C20400                      ret 0x4
+   329                                  
+   330                                  putc_vga:
+   331 00000289 55                          push ebp
+   332 0000028A 89E5                        mov ebp, esp
+   333                                  
+   334 0000028C 8A4508                      mov al, byte [ebp+0x8]
+   335                                  
+   336 0000028F 3C0A                        cmp al, 0xa
+   337 00000291 7421                        je newline
+   338                                  
+   339                                      ; place character into video buffer
+   340 00000293 8B35[40030000]              mov esi, dword [vp_pos]
+   341 00000299 88843600800B00              mov byte [VIDEO_PTR+esi*2], al
+   342 000002A0 A0[44030000]                mov al, byte [current_attr]
+   343 000002A5 88843601800B00              mov byte [VIDEO_PTR+esi*2+1], al
+   344 000002AC FF05[40030000]              inc dword [vp_pos]
+   345 000002B2 EB1B                        jmp after_newline
+   346                                  
+   347                                  newline:
+   348 000002B4 31D2                        xor edx, edx
+   349 000002B6 A1[40030000]                mov eax, dword [vp_pos]
+   350 000002BB BB50000000                  mov ebx, ROWS
+   351 000002C0 F7F3                        div ebx
+   352 000002C2 2915[40030000]              sub dword [vp_pos], edx
+   353 000002C8 8305[40030000]50            add dword [vp_pos], ROWS
+   354                                  
+   355                                  after_newline:
+   356 000002CF 813D[40030000]D007-         cmp dword [vp_pos], SCREEN_SIZE
+   356 000002D7 0000               
+   357 000002D9 7C0C                        jl end_putc
+   358 000002DB 832D[40030000]50            sub dword [vp_pos], ROWS
+   359 000002E2 E83AFFFFFF                  call scroll
+   360                                  
+   361                                  end_putc:
+   362 000002E7 E80BFFFFFF                  call set_cursor
+   363                                  
+   364 000002EC 5D                          pop ebp
+   365 000002ED C20400                      ret 0x4
+   366                                  
+   367 000002F0 57656C636F6D652074-     welcome_msg: db "Welcome to stage 2! I love Nicole!", 0x0a, 0x0d, 0
+   367 000002F9 6F2073746167652032-
+   367 00000302 212049206C6F766520-
+   367 0000030B 4E69636F6C65210A0D-
+   367 00000314 00                 
+   368 00000315 204B42204445544543-     mb_msg: db " KB DETECTED", 0x0a, 0x0d, 0
+   368 0000031E 5445440A0D00       
+   369                                  
+   370 00000324 303132333435363738-     charset: db "0123456789ABCDEF"
+   370 0000032D 39414243444546     
+   371                                  
+   372 00000334 EFBE                    kernel_sectors: dw 0xBEEF
+   373 00000336 ADDE                    ramdisk_sectors: dw 0xDEAD
+   374 00000338 EFBE                    mem_size: dw 0xBEEF
+   375 0000033A 0000                    dw 0
+   376 0000033C [99010000]              printf_addr: dd printf
+   377                                  
+   378                                  SERIAL_PORT equ 0x3F8
+   379                                  
+   380                                  ROWS equ 80
+   381                                  COLUMNS equ 25
+   382                                  SCREEN_SIZE equ ROWS*COLUMNS
+   383                                  VIDEO_PTR equ 0xB8000
+   384 00000340 00000000                vp_pos: dd 0
+   385 00000344 17                      current_attr: db 0x17

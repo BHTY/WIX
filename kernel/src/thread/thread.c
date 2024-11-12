@@ -67,7 +67,7 @@ void create_thread(task_t* task, thread_func_t fn, void* param, int user_esp){
     stack--; *stack = 0;
 
     task->esp0 = (uint32_t)stack;
-    task->cr3 = (pgdir_t*)0x30000;
+    task->cr3 = (pgdir_t*)0x80000;
 
     if (user_esp){
         task->esp3 = (uint32_t)heap_alloc(4096) + 4096;

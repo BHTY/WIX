@@ -107,20 +107,20 @@ start_protected_mode:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	mov ebp, 0x90000;0x7C00
+	mov ebp, 0xA0000;0x7C00
 	mov esp, ebp
 
     mov byte [0xb8000], 'A'
 
-    mov dword [0x30000], 0x31007
-    mov dword [0x30800], 0x32007
+    mov dword [0x80000], 0x81007
+    mov dword [0x80800], 0x82007
 
     call fill_pt
 
     call map_kernel
 
     ; enable paging
-    mov eax, 0x30000
+    mov eax, 0x80000
     mov cr3, eax
     mov eax, cr0
     or eax, 0x80000001
@@ -146,7 +146,7 @@ map_kernel:
         shl ebx, 12
         add ebx, 0x10000
         or ebx, 7
-        mov [eax * 4 + 0x32000], ebx
+        mov [eax * 4 + 0x82000], ebx
 
         inc eax
         cmp eax, 16
@@ -161,7 +161,7 @@ fill_pt:
         mov ebx, eax
         shl ebx, 12
         or ebx, 7
-        mov [eax * 4 + 0x31000], ebx
+        mov [eax * 4 + 0x81000], ebx
 
         inc eax
         cmp eax, 256
