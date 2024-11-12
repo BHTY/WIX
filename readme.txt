@@ -1,3 +1,6 @@
-WIX is my attempt to write a simple OS kernel, based on some of my ideas combined with some UNIX design.
-
-I have a lot of ideas with fancy APCs and LPCs... let's learn the basics first!
+Todo List
+1. Beef up the Virtual Memory Manager
+2. Rewrite the heap manager
+3. Rewrite the scheduler (with TLS, spinlocks, sleeping)
+5. Write the IOS/VFS
+6. Processes (executable loader & system calls)
