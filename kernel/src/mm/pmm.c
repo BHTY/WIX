@@ -9,8 +9,6 @@
 #include <mm/pmm.h>
 #include <mm/bitarray.h>
 
-extern void (*dbg_printf)(const char*, ...);
-
 struct {
     size_t nbits;
     size_t arr_size;

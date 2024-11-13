@@ -23,7 +23,7 @@ typedef struct _int_state{
 
 extern void* isr_stub_table[];
 
-typedef uint32_t (*isr_func)(int_state_t*);
+typedef int (*isr_func)(int_state_t*);
 
 isr_func set_isr(int index, isr_func new_func);
 __attribute__((noreturn)) uint32_t exception_handler(int code, int_state_t state, uint32_t error_code);

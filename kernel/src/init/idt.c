@@ -12,12 +12,11 @@
 #include <tty/tty.h>
 #include <stdio.h>
 #include <kd/dis/dis386.h>
+#include <init/init.h>
 
 __attribute__((aligned(0x10))) static idt_entry_t idt[256];
 
 static idtr_t idtr;
-
-void (*dbg_printf)(const char*, ...) = 0;
 
 isr_func isr_table[256] = {0};
 
@@ -33,7 +32,7 @@ void trace(int_state_t* state){
 
     while(EBP && i){
         if(*(uint32_t*)(EBP+4)){
-            dbg_printf("%x\n", *(uint32_t*)(EBP+4));
+            printk("%x\n", *(uint32_t*)(EBP+4));
         } else{
             break;
         }
@@ -100,7 +99,7 @@ void bug_check(int_state_t* state, int code, uint32_t error_code, uint16_t cs, u
         tty_write(buf, strlen(buf));
     }
 
-    dbg_printf("Hey bub... we crashed\n");
+    printk("Hey bub... we crashed\n");
     
     while(1);
 }
@@ -126,13 +125,13 @@ __attribute__((noreturn)) uint32_t exception_handler(int code, int_state_t state
 /* Base exception handler */
 __attribute__((noreturn)) uint32_t old_exception_handler(int code, uint32_t error_code){
 
-    dbg_printf("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
+    printk("Unrecoverable Exception %x Code %x at %x:%x\n", code, error_code, *(uint32_t*)(&error_code + 2), *(uint32_t*)(&error_code + 1));
     
     if(code == 0x0E){
         uint32_t vaddr;
         __asm__ volatile("movl %cr2, %eax");
         __asm__ volatile ("movl %%eax, %0" : "=a" (vaddr));
-        dbg_printf("Page fault accessing %x\n", vaddr);
+        printk("Page fault accessing %x\n", vaddr);
     }
 
     while(1);

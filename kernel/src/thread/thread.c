@@ -11,19 +11,18 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/heap.h>
+#include <init/init.h>
 
 volatile uint32_t interrupt_tick = 0;
 
 task_t* cur_task;
 task_t base_task;
 
-extern void (*dbg_printf)(const char*, ...);
-
 void dump_regs(int_state_t* state){
-    dbg_printf("\nEAX: %x ECX: %x EBX: %x EDX: %x\nEBP: %x ESP: %x ESI: %x EDI: %x\n", state->eax, state->ecx, state->ebx, state->edx, state->ebp, state->esp, state->esi, state->edi);
+    printk("\nEAX: %x ECX: %x EBX: %x EDX: %x\nEBP: %x ESP: %x ESI: %x EDI: %x\n", state->eax, state->ecx, state->ebx, state->edx, state->ebp, state->esp, state->esi, state->edi);
 }
 
-uint32_t pit_isr(int_state_t* state){
+int pit_isr(int_state_t* state){
     interrupt_tick++;
     pic_send_eoi(0);
     task_switch(state);
@@ -33,7 +32,6 @@ void init_tasking(){
     interrupt_tick = 0;
     cur_task = &base_task;
     base_task.next = cur_task;
-    base_task.esp0 = 0xDEADBEEF;
     __asm__ volatile("movl %cr3, %eax");
     __asm__ volatile ("movl %%eax, %0" : "=a" (base_task.cr3));
     set_isr(0x70, pit_isr);
@@ -46,7 +44,7 @@ void init_tasking(){
 
 void thread_exit(){
     disable_interrupts();
-    dbg_printf("Thread exit!\n");
+    printk("Thread exit!\n");
     // TODO: cleanup the thread
     while(1);
 }
@@ -87,7 +85,7 @@ task_t* spawn_thread(thread_func_t fn, void* param, int user_esp){
 
     create_thread(cur_task->next, fn, param, user_esp);
 
-    dbg_printf("About to enable interrupts\n");
+    printk("About to enable interrupts\n");
 
     enable_interrupts();
 

@@ -9,8 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-extern void (*dbg_printf)(const char*, ...);
+#include <init/init.h>
 
 #define ALIGNMENT   4
 #define align(x,a)	((((x) % (a)) == 0) ? (x) : ((x) + (a)) - (x) % (a))
@@ -27,7 +26,7 @@ typedef struct mem_block{
 } mem_block_t;
 
 void print_heap_entry(mem_block_t* blk){
-    dbg_printf("%s %x: %x bytes\n", blk->used ? "USED" : "FREE", blk->data, blk->size);
+    printk("%s %x: %x bytes\n", blk->used ? "USED" : "FREE", blk->data, blk->size);
 }
 
 mem_block_t* heap_walk(mem_block_t* blk, void(*fn)(mem_block_t*)){

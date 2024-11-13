@@ -23,24 +23,26 @@
 #include <ios/buf.h>
 #include <ios/inode.h>
 #include <basedrv/fs/ustar.h>
+#include <mm/slab.h>
+#include <syscall/syscall.h>
+#include <basedrv/serial.h>
+#include <stdarg.h>
+#include <init/init.h>
 
-typedef struct kernel_startup_params {
-    uint16_t kernel_sectors;
-    uint16_t ramdisk_sectors;
-    uint16_t mem_size;
-    void (*printf)(const char*, ...);
-} kernel_startup_params_t;
+kernel_startup_params_t startup_params;
 
-extern void (*dbg_printf)(const char*, ...);
+int printk(const char* format, ...){
+    char str[1024];
+    va_list args;
+    int size;
 
-void print(char* str){
-    dbg_printf(str);
-}
+    va_start(args, format);
+    size = vsprintf(str, format, args);
+    va_end(args);
 
-uint32_t syscall_handler(int_state_t* state){
-    if(state->eax == 0x01) print((char*)(state->ebx));
+    com_write(COM1, str, size);
 
-    return 0;
+    return size;
 }
 
 uint32_t thread_fun_1(void* param);
@@ -60,38 +62,45 @@ void fs_test(kernel_startup_params_t* params, const char* filename){
 
     if (ip){
         int n = readi(ip, buffer, 0, 20);
-        dbg_printf("Read %x bytes from %s\n", n, filename);
-        dbg_printf("%s", buffer);
+        printk("Read %x bytes from %s\n", n, filename);
+        printk("%s", buffer);
     }
 }
-
-extern struct {
-    size_t nbits;
-    size_t arr_size;
-    uint32_t arr[120];
-} pageframe_bitmap;
 
 void _start(kernel_startup_params_t* params){
     char buf[40];
 
-    dbg_printf = params->printf;
-    
+    /* Copy startup parameters */
+    startup_params = *params;
+
+    /* Initialize the physical memory manager */
     pmm_init();
+    printk("PMM: \x1B[32mOK\x1B[0m\n");
+
+    /* Initialize the virtual memory manager */
+    vmm_init();
+    printk("VMM: \x1B[32mOK\x1B[0m\n");
+
+    /* Initialize the kernel heap */
     heap_init(0x100000);
-    init_tasking();
+
+    /* Set up multitasking */
     pic_remap(0x70, 0x78);
     idt_init();
     gdt_init();
-    set_isr(0x80, syscall_handler);
+    init_tasking();
+    set_isr(0x80, syscall_trap);
 
     unmap_page(cur_task->cr3, 0x0);
 
+    /* Initialize basic devices */
     tty_init();
-
     binit();
-
     fs_test(params, "test.txt");
 
+    printk("%x\n", commit_pages(513));
+    
+    /* Testing! */
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);
 

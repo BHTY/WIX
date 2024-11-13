@@ -68,6 +68,7 @@ thread_fun_1_3:
     mov eax, 0x01
     mov ebx, t1_string
     int 0x80
+    
     ;mov eax, 0xDEADBEEF
     ;int 0x80
     jmp thread_fun_1_3
@@ -121,6 +122,7 @@ jump_usermode:
 	iret
 
 test_user_function:
+    jmp $
     int 0x80
     push 1
     pop eax

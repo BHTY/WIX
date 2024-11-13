@@ -8,11 +8,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
-#include <tty/bootvid.h>
-
-extern void (*dbg_printf)(const char*, ...);
-
-#define dbg_printf(...) 
+#include <tty/bootvid.h> 
+#include <init/init.h>
 
 #define AWAITING_ESC 0
 #define AWAITING_BRACKET 1
@@ -54,7 +51,7 @@ void do_erase(int arg){
             end = 2000;
             break;
         default:
-            dbg_printf("Unknown erase command %x\n", arg);
+            printk("Unknown erase command %x\n", arg);
             break;
     }
 
@@ -120,7 +117,7 @@ void do_ansi_cmd(int ch){
             do_erase(i);
             break;
         default:
-            dbg_printf("HELP %c\nn_args=%x args[0]=%x args[1]=%x\n", ch, n_args, ansi_args[0], ansi_args[1]);
+            printk("HELP %c\nn_args=%x args[0]=%x args[1]=%x\n", ch, n_args, ansi_args[0], ansi_args[1]);
             break;
     }    
 }

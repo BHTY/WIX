@@ -11,8 +11,6 @@
 #include <basedrv/fs/ustar.h>
 #include <string.h>
 
-extern void (*dbg_printf)(const char*, ...);
-
 uint16_t devnum;
 
 int oct2bin(unsigned char *str, int size) {
