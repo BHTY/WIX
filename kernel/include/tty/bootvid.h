@@ -22,6 +22,8 @@
 #define COLOR_LIGHT_BROWN	0x0E
 #define COLOR_WHITE			0x0F
 
+#define BOOTVID_OFFSET(x,y)     ((x) + ((y) * ROWS))
+
 void bootvid_init();
 void bootvid_putch(char ch);
 void bootvid_fg(char fg);

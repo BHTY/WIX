@@ -58,6 +58,29 @@ void do_erase(int arg){
     bootvid_fill(start, end);
 }
 
+void do_erase_line(int arg){
+    int start, end;
+
+    switch(arg){
+        case 0: // erase from cursor to end of line
+            start = bootvid_cursor;
+            end = BOOTVID_OFFSET(0, bootvid_gety() + 1);
+            break;
+        case 1: // erase start of line to cursor
+            start = BOOTVID_OFFSET(0, bootvid_gety());
+            end = bootvid_cursor;
+            break;
+        case 2: // erase entire line
+            start = BOOTVID_OFFSET(0, bootvid_gety());
+            end = BOOTVID_OFFSET(0, bootvid_gety() + 1);
+            break;
+        default:
+            printk("Unknwon erase line command %x\n", arg);
+    }
+
+    bootvid_fill(start, end);
+}
+
 void do_ansi_cmd(int ch){
     int i;
     int arg1, arg2;
@@ -80,9 +103,11 @@ void do_ansi_cmd(int ch){
             break;
 
         case 'E':
+            bootvid_gotoxy(0, bootvid_gety() + ansi_args[0]);
             break;
 
         case 'F':
+            bootvid_gotoxy(0, bootvid_gety() - ansi_args[0]);
             break;
         
         case 'G':
@@ -115,6 +140,14 @@ void do_ansi_cmd(int ch){
                 i = ansi_args[0];
             }
             do_erase(i);
+            break;
+        case 'K':
+            if(n_args == 0){
+                i = 0;
+            } else {
+                i = ansi_args[0];
+            }
+            do_erase_line(i);
             break;
         default:
             printk("HELP %c\nn_args=%x args[0]=%x args[1]=%x\n", ch, n_args, ansi_args[0], ansi_args[1]);

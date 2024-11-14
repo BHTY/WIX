@@ -7,3 +7,4 @@
 int com_write(int minor, const char* buf, size_t count);
 int com_read(int minor, char* buf, size_t count);
 int com_ioctl(int minor, int op, void* data);
+void com_init(int minor);

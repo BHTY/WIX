@@ -1,5 +1,10 @@
 #include <init/io.h>
 #include <basedrv/serial.h>
+#include <init/idt.h>
+
+int com_isr(int_state_t* state){
+    // add into read buffer, notify TTY device, echo back?
+}
 
 int is_transmit_empty(int minor){
     return io_read_8(minor + 5) & 0x20;
@@ -42,8 +47,11 @@ int com_read(int minor, char* buf, size_t count){
 
 int com_ioctl(int minor, int op, void* data){
     // set frequency, block vs nonblock mode
+    
+}
 
-    io_write_8(minor + 1, 0x00); // disable interrupts
+void com_init(int minor){
+    io_write_8(minor + 1, 0x01); // disable interrupts
     io_write_8(minor + 3, 0x80); // enable DLAB (set baud rate divisor)
     io_write_8(minor + 0, 0x03); // set divisor to 3 (lo byte) 38400 baud
     io_write_8(minor + 1, 0x00); //                  (hi byte)

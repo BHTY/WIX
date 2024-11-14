@@ -73,7 +73,7 @@ uint16_t bootvid_gety(){
 
 int bootvid_gotoxy(uint16_t x, uint16_t y){
     if(x < ROWS && y < COLS){
-        bootvid_cursor = ROWS * y + x;
+        bootvid_cursor = BOOTVID_OFFSET(x, y);
         sync_cursor();
         return 1;
     }

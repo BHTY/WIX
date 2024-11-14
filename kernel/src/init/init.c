@@ -86,6 +86,7 @@ void _start(kernel_startup_params_t* params){
 
     /* Set up multitasking */
     pic_remap(0x70, 0x78);
+    pic_unmask_irq(4);
     idt_init();
     gdt_init();
     init_tasking();
@@ -97,9 +98,8 @@ void _start(kernel_startup_params_t* params){
     tty_init();
     binit();
     fs_test(params, "test.txt");
+    com_init(COM1);
 
-    printk("%x\n", commit_pages(513));
-    
     /* Testing! */
     spawn_thread(thread_fun_1, 0, 1);
     spawn_thread(thread_fun_2, 0, 1);
